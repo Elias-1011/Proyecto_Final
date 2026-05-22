@@ -1,0 +1,22 @@
+# Qt build
+*.pro.user
+*.pro.user.*
+build/
+build-*/
+*.o
+*.obj
+moc_*
+qrc_*
+ui_*
+*.moc
+Makefile
+.qmake.stash
+
+# Ejecutables
+*.exe
+*.app
+EsgrimaPrimordial
+
+# IDE
+.idea/
+.vscode/
