@@ -32,6 +32,5 @@ float FisicaTemblor::getOffsetX() const {
 
 float FisicaTemblor::getOffsetY() const {
     if (!activo) return 0.0f;
-    // Fase desplazada para que X e Y no sean identicos
     return (A * 0.6f) * sin(omega * t + 1.047f) * exp(-lambda * t);
 }

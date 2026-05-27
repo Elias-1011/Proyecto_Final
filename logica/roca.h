@@ -15,7 +15,6 @@ public:
     float getRadio()     const { return tamano / 2.0f; }
     bool  fueDestruida() const { return destruida;     }
 
-    // BRUTO: un golpe siempre destruye sin importar tamanio
     void destruir();
 
 private:

@@ -1,0 +1,28 @@
+<RCC>
+    <qresource prefix="/img">
+        <file>recursos/jugador_arriba_0.png</file>
+        <file>recursos/jugador_arriba_1.png</file>
+        <file>recursos/jugador_arriba_2.png</file>
+        <file>recursos/jugador_abajo_0.png</file>
+        <file>recursos/jugador_abajo_1.png</file>
+        <file>recursos/jugador_abajo_2.png</file>
+        <file>recursos/jugador_izq_0.png</file>
+        <file>recursos/jugador_izq_1.png</file>
+        <file>recursos/jugador_izq_2.png</file>
+        <file>recursos/jugador_der_0.png</file>
+        <file>recursos/jugador_der_1.png</file>
+        <file>recursos/jugador_der_2.png</file>
+        <file>recursos/jugador_ataque.png</file>
+        <file>recursos/roca_0.png</file>
+        <file>recursos/roca_1.png</file>
+        <file>recursos/roca_2.png</file>
+        <file>recursos/roca_3.png</file>
+        <file>recursos/roca_4.png</file>
+        <file>recursos/impacto.png</file>
+        <file>recursos/fondo_menu.png</file>
+        <file>recursos/fondo_escenario.png</file>
+        <file>recursos/transicion_inicio.png</file>
+        <file>recursos/transicion_fin_victoria.png</file>
+        <file>recursos/transicion_fin_derrota.png</file>
+    </qresource>
+</RCC>

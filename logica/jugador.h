@@ -15,7 +15,6 @@ public:
     void moverIzquierda(bool estado) { yendoLeft  = estado; }
     void moverDerecha  (bool estado) { yendoRight = estado; }
 
-    // TERCO: retorna false si ya esta atacando
     bool intentarAtacar();
     void finalizarAtaque() { atacando = false; }
     bool estaAtacando()    const { return atacando; }

@@ -24,7 +24,6 @@ void Jugador::actualizar(float dt) {
     if (yendoLeft)  dx -= velocidad * dt;
     if (yendoRight) dx += velocidad * dt;
 
-    // Evitar velocidad extra en diagonal
     if (dx != 0.0f && dy != 0.0f) {
         dx *= 0.7071f;
         dy *= 0.7071f;
