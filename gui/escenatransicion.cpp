@@ -38,15 +38,15 @@ void EscenaTransicion::construir(const QString& rutaImagen) {
         );
     img->setZValue(0);
 
-    connect(timer, &QTimer::timeout, this, &EscenaTransicion::avanzar);
+    connect(timer, &QTimer::timeout,
+            this, &EscenaTransicion::avanzar);
     timer->setSingleShot(true);
     timer->start(2000);
 }
 
 void EscenaTransicion::avanzar() {
-    if (tipo == TipoTransicion::InicioNivel1) {
+    if (tipo == TipoTransicion::InicioNivel1)
         ventana->cambiarEscena(new EscenaNivel1(ventana, dificil));
-    } else {
+    else
         ventana->cambiarEscena(new EscenaMenu(ventana));
-    }
 }

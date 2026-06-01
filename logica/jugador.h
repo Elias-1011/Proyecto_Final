@@ -15,10 +15,6 @@ public:
     void moverIzquierda(bool estado) { yendoLeft  = estado; }
     void moverDerecha  (bool estado) { yendoRight = estado; }
 
-    bool intentarAtacar();
-    void finalizarAtaque() { atacando = false; }
-    bool estaAtacando()    const { return atacando; }
-
     float getDirX() const { return dirX; }
     float getDirY() const { return dirY; }
 
@@ -29,7 +25,6 @@ public:
 
 private:
     bool  subiendo, bajando, yendoLeft, yendoRight;
-    bool  atacando;
     float dirX, dirY;
     short puntos;
     float limAncho, limAlto;

@@ -6,9 +6,6 @@
 
 class MainWindow;
 
-// Espacio reservado para el Nivel 2 (trabajo del companiero).
-// Por ahora muestra un texto y regresa al menu.
-
 class EscenaNivel2 : public QGraphicsScene {
     Q_OBJECT
 

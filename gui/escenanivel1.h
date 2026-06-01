@@ -3,6 +3,7 @@
 
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
+#include <QGraphicsRectItem>
 #include <QGraphicsTextItem>
 #include <QTimer>
 #include <QKeyEvent>
@@ -14,13 +15,11 @@
 
 class MainWindow;
 
-// Direccion actual del jugador para seleccionar el set de sprites correcto
 enum class Direccion { Arriba, Abajo, Izquierda, Derecha };
 
-// Datos de un efecto de impacto temporal
 struct EfectoImpacto {
     QGraphicsPixmapItem* item;
-    short                framesTick;   // cuantos ticks le quedan visible
+    short                framesTick;
 };
 
 class EscenaNivel1 : public QGraphicsScene {
@@ -45,38 +44,29 @@ private:
     Nivel1*     nivel;
     Dificultad* dif;
 
-    // ── Sprites jugador ──────────────────────────────────────────
-    // vector<QPixmap> justificado: acceso por indice O(1) para
-    // seleccionar frame segun direccion y tick de animacion
     QPixmap sprJugadorArriba[3];
     QPixmap sprJugadorAbajo[3];
     QPixmap sprJugadorIzq[3];
     QPixmap sprJugadorDer[3];
-    QPixmap sprAtaque;
-
-    // ── Sprites rocas ────────────────────────────────────────────
+    QPixmap sprAtaque[4];
     QPixmap sprRocas[5];
     QPixmap sprImpacto;
 
-    // ── Items graficos ───────────────────────────────────────────
     QGraphicsPixmapItem*        itemFondo;
     QGraphicsPixmapItem*        itemJugador;
     QList<QGraphicsPixmapItem*> itemsRocas;
-    QList<EfectoImpacto>        impactos;   // efectos temporales activos
+    QList<EfectoImpacto>        impactos;
 
-    // ── HUD ──────────────────────────────────────────────────────
     QGraphicsTextItem* textoTiempo;
     QGraphicsTextItem* textoRocas;
+    QGraphicsTextItem* textoVidas;
     QGraphicsTextItem* textoTemblor;
 
-    // ── Estado de animacion jugador ──────────────────────────────
     Direccion dirActual;
-    short     frameActual;      // 0, 1 o 2
-    short     ticksAnimacion;   // contador de frames para cambiar sprite
-    bool      estabaAtacando;
-    short     cantRocasAntes;   // para detectar nueva destruccion
+    short     frameActual;
+    short     ticksAnimacion;
+    short     ticksAtaqueVisible;
 
-    // ── Timers ───────────────────────────────────────────────────
     QTimer* timerLoop;
     QTimer* timerSpawn;
     QTimer* timerTemblor;
@@ -84,9 +74,9 @@ private:
 
     qint64 ultimoMs;
 
-    // ── Metodos privados ─────────────────────────────────────────
     void cargarSprites();
     void actualizarJugadorGrafico();
+    void verificarColisionAtaqueRoca();
     void sincronizarRocas();
     void actualizarImpactos();
     void actualizarHUD();
@@ -94,6 +84,16 @@ private:
 
     QPixmap* getSpriteSetActual();
     short    getFrameRoca(const Roca* r) const;
+    short    getIdxDireccion()           const;
+
+    static constexpr short TAM_JUGADOR     = 64;
+    static constexpr short TAM_ATAQUE      = 120;
+    static constexpr short TAM_ROCA_BASE   = 20;
+    static constexpr short TAM_ROCA_MAX    = 80;
+    static constexpr short TICKS_POR_FRAME = 8;
+    static constexpr short TICKS_IMPACTO   = 18;
+    static constexpr short TICKS_ATAQUE    = 12;
+    static constexpr float RANGO_ATAQUE = 70.0f;
 };
 
 #endif

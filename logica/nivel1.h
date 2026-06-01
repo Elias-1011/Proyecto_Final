@@ -9,17 +9,8 @@
 
 using namespace std;
 
-struct Lanza {
-    float x, y;
-    float dirX, dirY;
-    float distRecorrida;
-    bool  activa;
-};
-
-
 class Nivel1 {
 public:
-    //60 juego normal, 15 para sustentacion
     Nivel1(Dificultad* dificultad, short tiempoSegundos = 60);
     ~Nivel1();
 
@@ -27,28 +18,33 @@ public:
     void spawnRoca(float rx, float ry);
     void activarTemblor();
     void tickSegundo();
-
     void moverJugador(bool arriba, bool abajo,
                       bool izquierda, bool derecha);
-    void accionAtacar();
+    void iniciarAtaque();
+    bool estaAtacando()  const { return atacando; }
+    void registrarImpacto(short idxRoca);
 
-    bool  nivelTerminado() const { return !activo;                      }
-    bool  fueExitoso()     const { return exito;                        }
-    short getTiempo()      const { return tiempoRestante;               }
-    short getRocasDestr()  const { return rocasDestruidas;              }
-    short getRocasObj()    const { return dif->getRocasObjetivo();      }
-    short getMaxSimult()   const { return dif->getMaxRocasSimultaneas();}
-    float getOffsetX()     const { return temblor->getOffsetX();        }
-    float getOffsetY()     const { return temblor->getOffsetY();        }
+    bool  nivelTerminado() const { return !activo;                       }
+    bool  fueExitoso()     const { return exito;                         }
+    short getTiempo()      const { return tiempoRestante;                }
+    short getRocasDestr()  const { return rocasDestruidas;               }
+    short getRocasObj()    const { return dif->getRocasObjetivo();       }
+    short getMaxSimult()   const { return dif->getMaxRocasSimultaneas(); }
+    float getOffsetX()     const { return temblor->getOffsetX();         }
+    float getOffsetY()     const { return temblor->getOffsetY();         }
+
+    bool  getHayImpacto() const { return hayImpactoNuevo;  }
+    float getImpactoX()   const { return ultimoImpactoX;   }
+    float getImpactoY()   const { return ultimoImpactoY;   }
+    void  resetImpacto()        { hayImpactoNuevo = false; }
+    void finalizarAtaque() { atacando = false; }
 
     const Jugador&       getJugador() const { return *jugador; }
     const vector<Roca*>& getRocas()   const { return rocas;    }
-    const Lanza&         getLanza()   const { return lanza;    }
 
 private:
     Jugador*       jugador;
     vector<Roca*>  rocas;
-    Lanza          lanza;
     FisicaTemblor* temblor;
     Dificultad*    dif;
 
@@ -56,18 +52,17 @@ private:
     short rocasDestruidas;
     bool  activo;
     bool  exito;
+    bool  atacando;
 
-    void actualizarLanza(float dt);
-    float getLanzaPuntaX() const { return lanza.x + lanza.dirX * LONG_LANZA; }
-    float getLanzaPuntaY() const { return lanza.y + lanza.dirY * LONG_LANZA; }
+    float ultimoImpactoX;
+    float ultimoImpactoY;
+    bool  hayImpactoNuevo;
 
-    void verificarColisiones();
+    void verificarColisionRocaJugador();
     void limpiarInactivos();
     void terminar();
 
-    static constexpr float LONG_LANZA     = 42.0f;
-    static constexpr float VEL_LANZA      = 480.0f;
-    static constexpr float DIST_MAX_LANZA = 260.0f;
+    static constexpr float RADIO_JUGADOR = 20.0f;
 };
 
 #endif

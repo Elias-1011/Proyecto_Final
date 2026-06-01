@@ -20,14 +20,11 @@ private slots:
     void salir();
 
 private:
-    MainWindow*        ventana;
+    MainWindow*          ventana;
     QGraphicsPixmapItem* fondo;
-
-    // Botones Qt simples sobre la imagen de fondo
-    // Se usan QGraphicsProxyWidget para embeberlos en la escena
-    QPushButton* btnNivel1;
-    QPushButton* btnNivel2;
-    QPushButton* btnSalir;
+    QPushButton*         btnNivel1;
+    QPushButton*         btnNivel2;
+    QPushButton*         btnSalir;
 
     void configurarBoton(QPushButton* btn, const QString& texto,
                          int x, int y);

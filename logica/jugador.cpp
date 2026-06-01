@@ -8,10 +8,9 @@ Jugador::Jugador(float x, float y)
     : Personaje(x, y, 180.0f),
     subiendo(false), bajando(false),
     yendoLeft(false), yendoRight(false),
-    atacando(false),
     dirX(1.0f), dirY(0.0f),
     puntos(0),
-    limAncho(800.0f), limAlto(600.0f)
+    limAncho(900.0f), limAlto(700.0f)
 {}
 
 Jugador::~Jugador() {}
@@ -37,12 +36,6 @@ void Jugador::actualizar(float dt) {
 
     x = max(22.0f, min(x + dx, limAncho - 22.0f));
     y = max(22.0f, min(y + dy, limAlto  - 22.0f));
-}
-
-bool Jugador::intentarAtacar() {
-    if (atacando) return false;
-    atacando = true;
-    return true;
 }
 
 void Jugador::setLimites(float ancho, float alto) {

@@ -12,7 +12,10 @@
         <file>recursos/jugador_der_0.png</file>
         <file>recursos/jugador_der_1.png</file>
         <file>recursos/jugador_der_2.png</file>
-        <file>recursos/jugador_ataque.png</file>
+        <file>recursos/jugador_ataque_arriba.png</file>
+        <file>recursos/jugador_ataque_abajo.png</file>
+        <file>recursos/jugador_ataque_izq.png</file>
+        <file>recursos/jugador_ataque_der.png</file>
         <file>recursos/roca_0.png</file>
         <file>recursos/roca_1.png</file>
         <file>recursos/roca_2.png</file>

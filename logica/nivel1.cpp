@@ -10,21 +10,24 @@ Nivel1::Nivel1(Dificultad* dificultad, short tiempoSegundos)
     tiempoRestante(tiempoSegundos),
     rocasDestruidas(0),
     activo(true),
-    exito(false)
+    exito(false),
+    atacando(false),
+    ultimoImpactoX(0.0f),
+    ultimoImpactoY(0.0f),
+    hayImpactoNuevo(false)
 {
     if (!dificultad)
         throw invalid_argument("La dificultad no puede ser nula.");
     if (tiempoSegundos <= 0)
         throw invalid_argument("El tiempo debe ser positivo.");
 
-    jugador = new Jugador(400.0f, 300.0f);
-    jugador->setLimites(800.0f, 600.0f);
+    jugador = new Jugador(450.0f, 350.0f);
+    jugador->setLimites(900.0f, 700.0f);
 
     temblor = new FisicaTemblor(
         dif->getAmplitudTemblor(),
         15.0f, 2.5f, 2.5f
         );
-    lanza = {0, 0, 0, 0, 0, false};
 }
 
 Nivel1::~Nivel1() {
@@ -43,23 +46,28 @@ void Nivel1::actualizar(float dt) {
     for (Roca* r : rocas)
         if (r->estaActivo()) r->actualizar(dt);
 
-    if (lanza.activa)
-        actualizarLanza(dt);
-
-    verificarColisiones();
+    verificarColisionRocaJugador();
     limpiarInactivos();
 }
 
-void Nivel1::actualizarLanza(float dt) {
-    float paso = VEL_LANZA * dt;
-    lanza.x += lanza.dirX * paso;
-    lanza.y += lanza.dirY * paso;
-    lanza.distRecorrida += paso;
+void Nivel1::iniciarAtaque() {
+    if (!activo || atacando) return;
+    atacando = true;
+}
 
-    if (lanza.distRecorrida >= DIST_MAX_LANZA) {
-        lanza.activa = false;
-        jugador->finalizarAtaque();
-    }
+void Nivel1::registrarImpacto(short idxRoca) {
+    if (idxRoca < 0 || idxRoca >= (short)rocas.size()) return;
+    Roca* r = rocas[idxRoca];
+    if (!r->estaActivo()) return;
+
+    ultimoImpactoX  = r->getX();
+    ultimoImpactoY  = r->getY();
+    hayImpactoNuevo = true;
+
+    r->destruir();
+    rocasDestruidas++;
+    jugador->sumarPunto();
+    atacando = false;
 }
 
 void Nivel1::spawnRoca(float rx, float ry) {
@@ -87,37 +95,18 @@ void Nivel1::moverJugador(bool arriba, bool abajo,
     jugador->moverDerecha(derecha);
 }
 
-void Nivel1::accionAtacar() {
-    if (!activo || lanza.activa) return;
-    if (jugador->intentarAtacar()) {
-        lanza.x             = jugador->getX();
-        lanza.y             = jugador->getY();
-        lanza.dirX          = jugador->getDirX();
-        lanza.dirY          = jugador->getDirY();
-        lanza.distRecorrida = 0.0f;
-        lanza.activa        = true;
-    }
-}
-
-void Nivel1::verificarColisiones() {
-    if (!lanza.activa) return;
-
-    float px = getLanzaPuntaX();
-    float py = getLanzaPuntaY();
-
+void Nivel1::verificarColisionRocaJugador() {
     for (Roca* r : rocas) {
         if (!r->estaActivo()) continue;
 
-        float dx   = px - r->getX();
-        float dy   = py - r->getY();
+        float dx   = jugador->getX() - r->getX();
+        float dy   = jugador->getY() - r->getY();
         float dist = sqrt(dx*dx + dy*dy);
 
-        if (dist <= r->getRadio()) {
-            r->destruir();
-            rocasDestruidas++;
-            jugador->sumarPunto();
-            lanza.activa = false;
-            jugador->finalizarAtaque();
+        if (dist <= r->getRadio() + RADIO_JUGADOR) {
+            jugador->perderVida();
+            r->desactivar();
+            if (!jugador->estaVivo()) terminar();
             break;
         }
     }
@@ -142,6 +131,7 @@ void Nivel1::tickSegundo() {
 }
 
 void Nivel1::terminar() {
-    activo = false;
-    exito  = (rocasDestruidas >= dif->getRocasObjetivo());
+    activo   = false;
+    atacando = false;
+    exito    = (rocasDestruidas >= dif->getRocasObjetivo());
 }

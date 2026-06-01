@@ -27,9 +27,12 @@ EscenaDificultad::EscenaDificultad(MainWindow* ventana)
     configurarBoton(btnDificil, 350, 380);
     configurarBoton(btnVolver,  350, 480);
 
-    connect(btnFacil,   &QPushButton::clicked, this, &EscenaDificultad::elegirFacil);
-    connect(btnDificil, &QPushButton::clicked, this, &EscenaDificultad::elegirDificil);
-    connect(btnVolver,  &QPushButton::clicked, this, &EscenaDificultad::volver);
+    connect(btnFacil,   &QPushButton::clicked,
+            this, &EscenaDificultad::elegirFacil);
+    connect(btnDificil, &QPushButton::clicked,
+            this, &EscenaDificultad::elegirDificil);
+    connect(btnVolver,  &QPushButton::clicked,
+            this, &EscenaDificultad::volver);
 }
 
 EscenaDificultad::~EscenaDificultad() {}

@@ -11,7 +11,7 @@ EscenaMenu::EscenaMenu(MainWindow* ventana)
     : QGraphicsScene(0, 0, MainWindow::ANCHO, MainWindow::ALTO),
     ventana(ventana)
 {
-    QPixmap pixFondo("");
+    QPixmap pixFondo(":/img/recursos/fondo_menu.png");
     fondo = addPixmap(pixFondo.scaled(MainWindow::ANCHO, MainWindow::ALTO,
                                       Qt::IgnoreAspectRatio,
                                       Qt::SmoothTransformation));
@@ -21,17 +21,16 @@ EscenaMenu::EscenaMenu(MainWindow* ventana)
     btnNivel2 = new QPushButton("Nivel 2");
     btnSalir  = new QPushButton("Salir");
 
-    configurarBoton(btnNivel1, "Nivel 1",  350, 280);
-    configurarBoton(btnNivel2, "Nivel 2",  350, 360);
-    configurarBoton(btnSalir,  "Salir",    350, 440);
+    configurarBoton(btnNivel1, "Nivel 1", 350, 280);
+    configurarBoton(btnNivel2, "Nivel 2", 350, 360);
+    configurarBoton(btnSalir,  "Salir",   350, 440);
 
     connect(btnNivel1, &QPushButton::clicked, this, &EscenaMenu::irNivel1);
     connect(btnNivel2, &QPushButton::clicked, this, &EscenaMenu::irNivel2);
     connect(btnSalir,  &QPushButton::clicked, this, &EscenaMenu::salir);
 }
 
-EscenaMenu::~EscenaMenu() {
-}
+EscenaMenu::~EscenaMenu() {}
 
 void EscenaMenu::configurarBoton(QPushButton* btn, const QString& texto,
                                  int x, int y) {

@@ -165,19 +165,22 @@ release/qrc_recursos.cpp: recursos.qrc \
 		recursos/roca_2.png \
 		recursos/transicion_fin_victoria.png \
 		recursos/jugador_izq_2.png \
+		recursos/jugador_ataque_abajo.png \
 		recursos/roca_4.png \
 		recursos/jugador_arriba_2.png \
+		recursos/jugador_ataque_arriba.png \
 		recursos/jugador_izq_0.png \
+		recursos/jugador_ataque_der.png \
 		recursos/jugador_der_1.png \
 		recursos/jugador_izq_1.png \
 		recursos/fondo_menu.png \
 		recursos/transicion_inicio.png \
 		recursos/jugador_arriba_1.png \
-		recursos/jugador_ataque.png \
 		recursos/jugador_der_2.png \
 		recursos/impacto.png \
 		recursos/jugador_der_0.png \
 		recursos/jugador_abajo_1.png \
+		recursos/jugador_ataque_izq.png \
 		recursos/jugador_abajo_0.png \
 		recursos/transicion_fin_derrota.png \
 		recursos/jugador_arriba_0.png \

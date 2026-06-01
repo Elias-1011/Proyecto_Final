@@ -4,15 +4,10 @@
 #include <QDateTime>
 #include <QRandomGenerator>
 #include <QFont>
+#include <algorithm>
 #include <cmath>
 
 using namespace std;
-
-static constexpr short TICKS_POR_FRAME = 8;
-static constexpr short TICKS_IMPACTO   = 18;
-static constexpr short TAM_JUGADOR     = 64;
-static constexpr short TAM_ROCA_BASE   = 20;
-static constexpr short TAM_ROCA_MAX    = 80;
 
 EscenaNivel1::EscenaNivel1(MainWindow* ventana, bool esDificil)
     : QGraphicsScene(0, 0, MainWindow::ANCHO, MainWindow::ALTO),
@@ -20,8 +15,7 @@ EscenaNivel1::EscenaNivel1(MainWindow* ventana, bool esDificil)
       dirActual(Direccion::Abajo),
       frameActual(0),
       ticksAnimacion(0),
-      estabaAtacando(false),
-      cantRocasAntes(0)
+      ticksAtaqueVisible(0)
 {
     dif   = esDificil ? (Dificultad*) new DificultadDificil()
                       : (Dificultad*) new DificultadFacil();
@@ -38,7 +32,6 @@ EscenaNivel1::EscenaNivel1(MainWindow* ventana, bool esDificil)
 
     itemJugador = addPixmap(sprJugadorAbajo[0]);
     itemJugador->setZValue(2);
-    itemJugador->setTransformOriginPoint(TAM_JUGADOR / 2, TAM_JUGADOR / 2);
 
     QFont fHUD("Arial", 14, QFont::Bold);
 
@@ -51,6 +44,11 @@ EscenaNivel1::EscenaNivel1(MainWindow* ventana, bool esDificil)
     textoRocas->setDefaultTextColor(Qt::white);
     textoRocas->setPos(10, 36);
     textoRocas->setZValue(4);
+
+    textoVidas = addText("Vidas: 3", fHUD);
+    textoVidas->setDefaultTextColor(QColor(255, 80, 80));
+    textoVidas->setPos(10, 62);
+    textoVidas->setZValue(4);
 
     textoTemblor = addText("");
     textoTemblor->setDefaultTextColor(QColor(255, 80, 0));
@@ -88,32 +86,48 @@ EscenaNivel1::~EscenaNivel1() {
 
 void EscenaNivel1::cargarSprites() {
     for (short i = 0; i < 3; i++) {
-        sprJugadorArriba[i] = QPixmap(QString(":/img/recursos/jugador_arriba_%1.png").arg(i))
-                              .scaled(TAM_JUGADOR, TAM_JUGADOR,
-                                      Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        sprJugadorAbajo[i]  = QPixmap(QString(":/img/recursos/jugador_abajo_%1.png").arg(i))
-                              .scaled(TAM_JUGADOR, TAM_JUGADOR,
-                                      Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        sprJugadorIzq[i]    = QPixmap(QString(":/img/recursos/jugador_izq_%1.png").arg(i))
-                              .scaled(TAM_JUGADOR, TAM_JUGADOR,
-                                      Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        sprJugadorDer[i]    = QPixmap(QString(":/img/recursos/jugador_der_%1.png").arg(i))
-                              .scaled(TAM_JUGADOR, TAM_JUGADOR,
-                                      Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        sprJugadorArriba[i] = QPixmap(
+            QString(":/img/recursos/jugador_arriba_%1.png").arg(i))
+            .scaled(TAM_JUGADOR, TAM_JUGADOR,
+                    Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        sprJugadorAbajo[i] = QPixmap(
+            QString(":/img/recursos/jugador_abajo_%1.png").arg(i))
+            .scaled(TAM_JUGADOR, TAM_JUGADOR,
+                    Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        sprJugadorIzq[i] = QPixmap(
+            QString(":/img/recursos/jugador_izq_%1.png").arg(i))
+            .scaled(TAM_JUGADOR, TAM_JUGADOR,
+                    Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        sprJugadorDer[i] = QPixmap(
+            QString(":/img/recursos/jugador_der_%1.png").arg(i))
+            .scaled(TAM_JUGADOR, TAM_JUGADOR,
+                    Qt::KeepAspectRatio, Qt::SmoothTransformation);
     }
 
-    sprAtaque  = QPixmap(":/img/recursos/jugador_ataque.png")
-                 .scaled(TAM_JUGADOR, TAM_JUGADOR,
-                         Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    sprAtaque[0] = QPixmap(":/img/recursos/jugador_ataque_arriba.png")
+                   .scaled(TAM_ATAQUE, TAM_ATAQUE,
+                           Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    sprAtaque[1] = QPixmap(":/img/recursos/jugador_ataque_abajo.png")
+                   .scaled(TAM_ATAQUE, TAM_ATAQUE,
+                           Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    sprAtaque[2] = QPixmap(":/img/recursos/jugador_ataque_izq.png")
+                   .scaled(TAM_ATAQUE, TAM_ATAQUE,
+                           Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    sprAtaque[3] = QPixmap(":/img/recursos/jugador_ataque_der.png")
+                   .scaled(TAM_ATAQUE, TAM_ATAQUE,
+                           Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
     sprImpacto = QPixmap(":/img/recursos/impacto.png")
                  .scaled(TAM_ROCA_MAX, TAM_ROCA_MAX,
                          Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
     for (short i = 0; i < 5; i++) {
-        short tam = TAM_ROCA_BASE + (TAM_ROCA_MAX - TAM_ROCA_BASE) * i / 4;
-        sprRocas[i] = QPixmap(QString(":/img/recursos/roca_%1.png").arg(i))
-                      .scaled(tam, tam,
-                              Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        short tam = TAM_ROCA_BASE +
+                    (TAM_ROCA_MAX - TAM_ROCA_BASE) * i / 4;
+        sprRocas[i] = QPixmap(
+            QString(":/img/recursos/roca_%1.png").arg(i))
+            .scaled(tam, tam,
+                    Qt::KeepAspectRatio, Qt::SmoothTransformation);
     }
 }
 
@@ -136,7 +150,11 @@ void EscenaNivel1::keyPressEvent(QKeyEvent* e) {
         dirActual = Direccion::Derecha;
         break;
     case Qt::Key_Space:
-        nivel->accionAtacar();
+        if (!nivel->estaAtacando()) {
+            nivel->iniciarAtaque();
+            ticksAtaqueVisible = TICKS_ATAQUE;
+            verificarColisionAtaqueRoca();
+        }
         break;
     default:
         break;
@@ -163,8 +181,8 @@ void EscenaNivel1::actualizarFrame() {
 
     nivel->actualizar(dt);
 
-    actualizarJugadorGrafico();
     sincronizarRocas();
+    actualizarJugadorGrafico();
     actualizarImpactos();
     actualizarHUD();
     verificarFin();
@@ -185,43 +203,32 @@ void EscenaNivel1::dispararTemblor() {
 }
 
 void EscenaNivel1::tickSegundo() {
-    if (!nivel->nivelTerminado())
+    if (!nivel->nivelTerminado()) {
         nivel->tickSegundo();
+        if (nivel->nivelTerminado()) {
+            timerLoop->stop();
+            timerSpawn->stop();
+            timerTemblor->stop();
+            timerSegundo->stop();
+            bool exitoso     = nivel->fueExitoso();
+            MainWindow* vent = ventana;
+            QTimer::singleShot(100, vent, [vent, exitoso]() {
+                vent->cambiarEscena(
+                    new EscenaTransicion(vent, exitoso, true)
+                );
+            });
+        }
+    }
 }
 
-void EscenaNivel1::actualizarJugadorGrafico() {
-    const Jugador& jug = nivel->getJugador();
-    float ox = nivel->getOffsetX();
-    float oy = nivel->getOffsetY();
-
-    bool atacando = nivel->getLanza().activa;
-
-    if (atacando) {
-        itemJugador->setPixmap(sprAtaque);
-        ticksAnimacion = 0;
-        frameActual    = 0;
-    } else {
-        bool moviendose = jug.estaAtacando() == false &&
-                          (jug.getDirX() != 0.0f || jug.getDirY() != 0.0f);
-
-        if (moviendose) {
-            ticksAnimacion++;
-            if (ticksAnimacion >= TICKS_POR_FRAME) {
-                ticksAnimacion = 0;
-                frameActual    = (frameActual + 1) % 3;
-            }
-        } else {
-            frameActual    = 0;
-            ticksAnimacion = 0;
-        }
-
-        QPixmap* set = getSpriteSetActual();
-        itemJugador->setPixmap(set[frameActual]);
+short EscenaNivel1::getIdxDireccion() const {
+    switch (dirActual) {
+    case Direccion::Arriba:    return 0;
+    case Direccion::Abajo:     return 1;
+    case Direccion::Izquierda: return 2;
+    case Direccion::Derecha:   return 3;
+    default:                   return 1;
     }
-    itemJugador->setPos(jug.getX() - TAM_JUGADOR / 2 + ox,
-                        jug.getY() - TAM_JUGADOR / 2 + oy);
-
-    estabaAtacando = atacando;
 }
 
 QPixmap* EscenaNivel1::getSpriteSetActual() {
@@ -234,6 +241,59 @@ QPixmap* EscenaNivel1::getSpriteSetActual() {
     }
 }
 
+void EscenaNivel1::actualizarJugadorGrafico() {
+    const Jugador& jug = nivel->getJugador();
+    float ox = nivel->getOffsetX();
+    float oy = nivel->getOffsetY();
+
+    if (ticksAtaqueVisible > 0) {
+        ticksAtaqueVisible--;
+        itemJugador->setPixmap(sprAtaque[getIdxDireccion()]);
+        itemJugador->setPos(jug.getX() - TAM_ATAQUE / 2 + ox,
+                            jug.getY() - TAM_ATAQUE / 2 + oy);
+        if (ticksAtaqueVisible == 0)
+            nivel->finalizarAtaque();
+    } else {
+        bool moviendose = (jug.getDirX() != 0.0f ||
+                           jug.getDirY() != 0.0f);
+        if (moviendose) {
+            ticksAnimacion++;
+            if (ticksAnimacion >= TICKS_POR_FRAME) {
+                ticksAnimacion = 0;
+                frameActual    = (frameActual + 1) % 3;
+            }
+        } else {
+            frameActual    = 0;
+            ticksAnimacion = 0;
+        }
+        itemJugador->setPixmap(getSpriteSetActual()[frameActual]);
+        itemJugador->setPos(jug.getX() - TAM_JUGADOR / 2 + ox,
+                            jug.getY() - TAM_JUGADOR / 2 + oy);
+    }
+}
+
+void EscenaNivel1::verificarColisionAtaqueRoca() {
+    const Jugador&       jug   = nivel->getJugador();
+    const vector<Roca*>& rocas = nivel->getRocas();
+
+    for (short i = 0; i < (short)rocas.size(); i++) {
+        if (!rocas[i]->estaActivo()) continue;
+
+        float dx   = rocas[i]->getX() - jug.getX();
+        float dy   = rocas[i]->getY() - jug.getY();
+        float dist = sqrt(dx*dx + dy*dy);
+
+        if (dist <= rocas[i]->getRadio() + RANGO_ATAQUE) {
+            float dot = dx * jug.getDirX() + dy * jug.getDirY();
+            if (dot > 0.0f) {
+                nivel->registrarImpacto(i);
+                return;
+            }
+        }
+    }
+    nivel->finalizarAtaque();
+}
+
 short EscenaNivel1::getFrameRoca(const Roca* r) const {
     float pct = r->getTamano() / r->getTamanoMax();
     short f   = (short)(pct * 4.0f);
@@ -242,34 +302,33 @@ short EscenaNivel1::getFrameRoca(const Roca* r) const {
 }
 
 void EscenaNivel1::sincronizarRocas() {
-    const vector<Roca*>& rocas = nivel->getRocas();
-
-    short cantAhora = nivel->getRocasDestr();
-    if (cantAhora > cantRocasAntes) {
-        for (Roca* r : rocas) {
-            if (r->fueDestruida() && !r->estaActivo()) {
-                QGraphicsPixmapItem* itemImp = addPixmap(sprImpacto);
-                itemImp->setPos(r->getX() - TAM_ROCA_MAX / 2,
-                                r->getY() - TAM_ROCA_MAX / 2);
-                itemImp->setZValue(3);
-                impactos.append({itemImp, TICKS_IMPACTO});
-                break;
-            }
-        }
-        cantRocasAntes = cantAhora;
+    if (nivel->getHayImpacto()) {
+        QGraphicsPixmapItem* itemImp = addPixmap(sprImpacto);
+        itemImp->setPos(nivel->getImpactoX() - TAM_ROCA_MAX / 2,
+                        nivel->getImpactoY() - TAM_ROCA_MAX / 2);
+        itemImp->setZValue(3);
+        impactos.append({itemImp, TICKS_IMPACTO});
+        nivel->resetImpacto();
     }
+
+    const vector<Roca*>& rocas = nivel->getRocas();
 
     while (itemsRocas.size() < (int)rocas.size()) {
         QGraphicsPixmapItem* item = addPixmap(QPixmap());
         item->setZValue(1);
         itemsRocas.append(item);
     }
+
     for (int i = 0; i < (int)rocas.size(); i++) {
-        Roca* r     = rocas[i];
-        short frame = getFrameRoca(r);
-        itemsRocas[i]->setPixmap(sprRocas[frame]);
-        itemsRocas[i]->setPos(r->getX() - r->getTamano() / 2,
-                               r->getY() - r->getTamano() / 2);
+        const Roca* r = rocas[i];
+        short       f = getFrameRoca(r);
+        short       t = (short)r->getTamano();
+
+        if (itemsRocas[i]->pixmap().width() != sprRocas[f].width())
+            itemsRocas[i]->setPixmap(sprRocas[f]);
+
+        itemsRocas[i]->setPos(r->getX() - t / 2,
+                               r->getY() - t / 2);
         itemsRocas[i]->setVisible(r->estaActivo());
     }
 
@@ -281,6 +340,7 @@ void EscenaNivel1::sincronizarRocas() {
 void EscenaNivel1::actualizarImpactos() {
     for (EfectoImpacto& ef : impactos)
         ef.framesTick--;
+
     impactos.erase(
         remove_if(impactos.begin(), impactos.end(),
                   [this](EfectoImpacto& ef) {
@@ -299,8 +359,10 @@ void EscenaNivel1::actualizarHUD() {
     textoTiempo->setPlainText(
         "Tiempo: " + QString::number(nivel->getTiempo()) + "s");
     textoRocas->setPlainText(
-        "Rocas: " + QString::number(nivel->getRocasDestr()) +
-        " / "     + QString::number(nivel->getRocasObj()));
+        "Rocas: "  + QString::number(nivel->getRocasDestr()) +
+        " / "      + QString::number(nivel->getRocasObj()));
+    textoVidas->setPlainText(
+        "Vidas: "  + QString::number(nivel->getJugador().getVidas()));
     textoTemblor->setPlainText(
         nivel->getOffsetX() != 0.0f ? "TEMBLOR SISMICO!" : "");
 }
@@ -313,7 +375,11 @@ void EscenaNivel1::verificarFin() {
     timerTemblor->stop();
     timerSegundo->stop();
 
-    ventana->cambiarEscena(
-        new EscenaTransicion(ventana, nivel->fueExitoso(), true)
-    );
+    bool exitoso     = nivel->fueExitoso();
+    MainWindow* vent = ventana;
+    QTimer::singleShot(100, vent, [vent, exitoso]() {
+        vent->cambiarEscena(
+            new EscenaTransicion(vent, exitoso, true)
+        );
+    });
 }

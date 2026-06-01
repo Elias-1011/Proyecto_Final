@@ -14,18 +14,18 @@ MainWindow::MainWindow(QWidget* parent)
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setFrameStyle(0);
     setCentralWidget(view);
+
     EscenaMenu* menu = new EscenaMenu(this);
     cambiarEscena(menu);
 }
 
 MainWindow::~MainWindow() {
-    delete escenaActual;
 }
 
 void MainWindow::cambiarEscena(QGraphicsScene* nuevaEscena) {
     if (escenaActual) {
         view->setScene(nullptr);
-        delete escenaActual;
+        escenaActual->deleteLater();
     }
     escenaActual = nuevaEscena;
     view->setScene(escenaActual);
