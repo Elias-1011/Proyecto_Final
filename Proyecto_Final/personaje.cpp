@@ -1,30 +1,33 @@
 #include "personaje.h"
+#include <cmath>
 
-Personaje::Personaje(float x, float y) : m_x(x), m_y(y), m_velX(0.0f), m_velY(0.0f),
-    m_enSuelo(true),
-    m_puntosVida(0),
-    m_rangoAtaque(50.0f),      // hitbox de embestida: 40px de ancho
-    m_cooldownRestante(0.0f),
+Personaje::Personaje(float x, float y)
+    : m_x(x), m_y(y)
+    , m_velX(0.0f), m_velY(0.0f)
+    , m_enSuelo(true)
+    , m_puntosVida(0)
+    , m_rangoAtaque(50.0f)      // hitbox de embestida: 40px de ancho
+    , m_cooldownRestante(0.0f)
 
-    m_embistiendo(false),
-    m_recuperando(false),
-    m_yaGolpeo(false),
-    m_dirEmbestida(1.0f),
-    m_distEmbestidaRecorrida(0.0f),
-    m_tiempoRecuperacion(0.0f),
+    , m_embistiendo(false)
+    , m_recuperando(false)
+    , m_yaGolpeo(false)
+    , m_dirEmbestida(1.0f)
+    , m_distEmbestidaRecorrida(0.0f)
+    , m_tiempoRecuperacion(0.0f)
 
-    m_velImpulsoEsquive(300.0f),
-    m_friccion(0.85f),
-    m_umbralParada(5.0f),
-    m_velVerticalSalto(-500.0f),
-    m_gravedad(1000.0f),
-    m_yBase(y),
-    m_velEmbestida(550.0f),    // la embestida es rápida y contundente
-    m_distEmbestida(200.0f),   // recorre 200px fijos
-    m_cooldownAtaque(1.2f),    // 1.2s de cooldown total tras embestida
-    m_duracionRecuperacion(0.4f), // 0.4s vulnerable al terminar
-    m_velBaseRetroceso(150.0f),
-    m_factorEscalaRetroceso(1.5f)
+    , m_velImpulsoEsquive(300.0f)
+    , m_friccion(0.85f)
+    , m_umbralParada(5.0f)
+    , m_velVerticalSalto(-500.0f)
+    , m_gravedad(1000.0f)
+    , m_yBase(y)
+    , m_velEmbestida(550.0f)    // la embestida es rápida y contundente
+    , m_distEmbestida(200.0f)   // recorre 200px fijos
+    , m_cooldownAtaque(1.2f)    // 1.2s de cooldown total tras embestida
+    , m_duracionRecuperacion(0.4f) // 0.4s vulnerable al terminar
+    , m_velBaseRetroceso(150.0f)
+    , m_factorEscalaRetroceso(1.5f)
 {}
 
 void Personaje::actualizar(float dt) {
@@ -92,9 +95,6 @@ void Personaje::reiniciarBarra() {
 void Personaje::aplicarOffsetTemblor(float offset) {
     if (!m_embistiendo) m_x += offset;
 }
-
-
-// Privados
 
 void Personaje::actualizarEmbestida(float dt) {
     if (m_recuperando) {

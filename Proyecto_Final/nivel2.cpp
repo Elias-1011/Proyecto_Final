@@ -1,4 +1,6 @@
 #include "nivel2.h"
+#include <cmath>
+#include <cstdlib>
 
 Nivel_2::Nivel_2()
     : m_jugador(nullptr)
@@ -23,11 +25,7 @@ Nivel_2::~Nivel_2() {
     delete m_temblor;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Iniciar
-// ─────────────────────────────────────────────────────────────────────────────
 void Nivel_2::iniciar() {
-    // Posiciones iniciales: jugador a la izquierda, agente a la derecha
     const float Y_SUELO = 500.0f;
 
     m_jugador = new Principal(150.0f, Y_SUELO);
@@ -35,11 +33,7 @@ void Nivel_2::iniciar() {
 
     m_enemigo = new Enemigo(650.0f, Y_SUELO, this);
 
-    // Temblor con parámetros calibrados para el duelo
-    m_temblor = new Temblor(/*amplitud*/ 18.0f,
-                            /*frecuencia*/ 3.5f,
-                            /*duracion*/ 2.0f,
-                            /*amortiguamiento*/ 2.5f);
+    m_temblor = new Temblor(18.0f, 3.5f, 2.0f, 2.5f);
 
     m_puntosPrincipal = 0;
     m_puntosEnemigo   = 0;
@@ -47,27 +41,19 @@ void Nivel_2::iniciar() {
     reiniciarRonda();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Actualizar (game loop del nivel)
-// ─────────────────────────────────────────────────────────────────────────────
 void Nivel_2::actualizar(float dt) {
     if (m_finalizado) return;
 
-    // ── 1. Input del jugador ──────────────────────────────────────────────────
     m_jugador->procesarEntrada();
-
-    // ── 2. Actualizar personajes ──────────────────────────────────────────────
     m_jugador->actualizar(dt);
-    m_enemigo->actualizar(dt);   // incluye el ciclo percibir/razonar/actuar
+    m_enemigo->actualizar(dt);
 
-    // ── 3. Temblor sísmico ────────────────────────────────────────────────────
+    // Temblor periódico
     m_tiempoHasteTemblor -= dt;
     if (m_tiempoHasteTemblor <= 0.0f) {
         m_temblor->iniciar();
-        m_tiempoHasteTemblor = m_intervaloTemblor
-                               + static_cast<float>(std::rand() % 5); // variación ±5s
+        m_tiempoHasteTemblor = m_intervaloTemblor + static_cast<float>(std::rand() % 5);
     }
-
     if (m_temblor->estaActivo()) {
         m_temblor->actualizar(dt);
         float offset = m_temblor->getOffset();
@@ -75,53 +61,47 @@ void Nivel_2::actualizar(float dt) {
         m_enemigo->aplicarOffsetTemblor(offset);
     }
 
-    // ── 4. Limitar personajes a la plataforma ─────────────────────────────────
     limitarPersonajesEnPlataforma();
-
-    // ── 5. Detección de toques ────────────────────────────────────────────────
     detectarToques();
-
-    // ── 6. Gestionar combate (puntos, victoria) ───────────────────────────────
     gestionarCombate();
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Detección de toques
+// Detección de toques — basada en embestida, no en proyectil
+//
+// Un toque es válido cuando el personaje que embiste se solapa con el oponente.
+// "Solapar" = la distancia entre sus centros es menor que la suma de
+// sus medios-hitbox (rangoAtaque / 2 de cada uno).
 // ─────────────────────────────────────────────────────────────────────────────
 void Nivel_2::detectarToques() {
-    const float RADIO_IMPACTO = 30.0f;  // píxeles — ajustar con sprites reales
+    float dist = getDistanciaEntrePersonajes();
 
-    // Proyectil del jugador impacta al enemigo
-    if (m_jugador->hayProyectilActivo()) {
-        float dx = m_jugador->getProyectilX() - m_enemigo->getX();
-        float dy = m_jugador->getProyectilY() - m_enemigo->getY();
-        float dist = std::sqrt(dx * dx + dy * dy);
+    // Hitbox combinado: medio hitbox del atacante + radio del receptor (30px fijo)
+    const float RADIO_RECEPTOR = 30.0f;
 
-        if (dist <= RADIO_IMPACTO) {
-            m_jugador->desactivarProyectil();
-            m_toquesPrincipal++;  // toques del jugador sobre el enemigo
-
+    // ── Jugador embiste al enemigo ────────────────────────────────────────────
+    if (m_jugador->estaEmbistiendo() && !m_jugador->yaGolpeoEnEstaEmbestida()) {
+        float hitbox = m_jugador->getRangoAtaque() / 2.0f + RADIO_RECEPTOR;
+        if (dist <= hitbox) {
+            m_jugador->marcarGolpe();
+            m_toquesPrincipal++;
             float dirRetroceso = (m_jugador->getX() < m_enemigo->getX()) ? 1.0f : -1.0f;
             bool puntoCompleto = m_enemigo->recibirImpacto(dirRetroceso, m_toquesPrincipal);
 
             if (puntoCompleto) {
                 m_puntosPrincipal++;
-                m_enemigo->aprender();   // el agente aprende al final del punto
+                m_enemigo->aprender();
                 reiniciarRonda();
             }
         }
     }
 
-    // Proyectil del enemigo impacta al jugador
-    if (m_enemigo->hayProyectilActivo()) {
-        float dx = m_enemigo->getProyectilX() - m_jugador->getX();
-        float dy = m_enemigo->getProyectilY() - m_jugador->getY();
-        float dist = std::sqrt(dx * dx + dy * dy);
-
-        if (dist <= RADIO_IMPACTO) {
-            m_enemigo->desactivarProyectil();
-            m_toquesEnemigo++;   // toques del enemigo sobre el jugador
-
+    // ── Agente embiste al jugador ─────────────────────────────────────────────
+    if (m_enemigo->estaEmbistiendo() && !m_enemigo->yaGolpeoEnEstaEmbestida()) {
+        float hitbox = m_enemigo->getRangoAtaque() / 2.0f + RADIO_RECEPTOR;
+        if (dist <= hitbox) {
+            m_enemigo->marcarGolpe();
+            m_toquesEnemigo++;
             float dirRetroceso = (m_enemigo->getX() < m_jugador->getX()) ? 1.0f : -1.0f;
             bool puntoCompleto = m_jugador->recibirImpacto(dirRetroceso, m_toquesEnemigo);
 
@@ -134,20 +114,13 @@ void Nivel_2::detectarToques() {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Reiniciar ronda
-// ─────────────────────────────────────────────────────────────────────────────
 void Nivel_2::reiniciarRonda() {
     m_toquesPrincipal = 0;
     m_toquesEnemigo   = 0;
-
     if (m_jugador) m_jugador->reiniciarBarra();
     if (m_enemigo) m_enemigo->reiniciarBarra();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Gestionar combate — comprobar condición de victoria
-// ─────────────────────────────────────────────────────────────────────────────
 void Nivel_2::gestionarCombate() {
     if (m_puntosPrincipal >= m_puntosParaGanar ||
         m_puntosEnemigo   >= m_puntosParaGanar) {
@@ -156,17 +129,10 @@ void Nivel_2::gestionarCombate() {
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Finalizar
-// ─────────────────────────────────────────────────────────────────────────────
 void Nivel_2::finalizar() {
-    // En la integración con Qt, aquí se emitirá una señal al objeto Juego
-    // para que cambie el estado a VICTORIA o GAME_OVER según jugadorGano().
+    // Al integrar Qt: emitir señal al objeto Juego con el resultado
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Acceso al estado (para Enemigo::percibir)
-// ─────────────────────────────────────────────────────────────────────────────
 float Nivel_2::getDistanciaEntrePersonajes() const {
     if (!m_jugador || !m_enemigo) return 0.0f;
     return std::abs(m_jugador->getX() - m_enemigo->getX());
@@ -180,14 +146,6 @@ bool Nivel_2::getTemblorActivo() const {
     return m_temblor && m_temblor->estaActivo();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Limitar personajes a la plataforma
-// ─────────────────────────────────────────────────────────────────────────────
 void Nivel_2::limitarPersonajesEnPlataforma() {
-    // Jugador
-    if (m_jugador->getX() < m_xMinPlataforma) {
-        // Forzar posición: ajuste directo vía mover
-        // (en Qt se expondrá un setter; por ahora se compensa con mover)
-    }
-    // (La restricción completa se implementa con setX en la capa gráfica)
+    // Se implementa con setX() al integrar Qt
 }

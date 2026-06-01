@@ -1,6 +1,8 @@
 #ifndef PERSONAJE_H
 #define PERSONAJE_H
 
+#include "enums.h"
+
 class Personaje {
 public:
     Personaje(float x, float y);
@@ -26,19 +28,24 @@ public:
 
     bool  estaEmbistiendo()    const { return m_embistiendo; }
     float getDirEmbestida()    const { return m_dirEmbestida; }
+
     bool  yaGolpeoEnEstaEmbestida() const { return m_yaGolpeo; }
     void  marcarGolpe()              { m_yaGolpeo = true; }
+
     bool  estaRecuperando()    const { return m_recuperando; }
 
 protected:
+    //Posición y movimiento
     float m_x, m_y;
     float m_velX, m_velY;
     bool  m_enSuelo;
 
+    // Combate
     int   m_puntosVida;
     float m_rangoAtaque;        // hitbox de la embestida (ancho en px)
     float m_cooldownRestante;
 
+    // ── Estado de embestida
     bool  m_embistiendo;        // true mientras avanza la embestida
     bool  m_recuperando;        // true durante el lag post-embestida
     bool  m_yaGolpeo;           // evita registrar el mismo toque varios frames
@@ -46,6 +53,7 @@ protected:
     float m_distEmbestidaRecorrida; // cuánto ha avanzado ya
     float m_tiempoRecuperacion; // contador de lag restante
 
+    // ── Parámetros físicos
     float m_velImpulsoEsquive;
     float m_friccion;
     float m_umbralParada;

@@ -9,16 +9,22 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    enemigo.cpp \
     main.cpp \
     mainwindow.cpp \
     nivel2.cpp \
     personaje.cpp \
+    principal.cpp \
     temblor.cpp
 
 HEADERS += \
+    enemigo.h \
+    enums.h \
     mainwindow.h \
     nivel2.h \
+    perfilJugador.h \
     personaje.h \
+    principal.h \
     temblor.h
 
 FORMS += \

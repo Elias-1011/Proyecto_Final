@@ -1,6 +1,11 @@
 #ifndef NIVEL2_H
 #define NIVEL2_H
 
+#include "enums.h"
+#include "temblor.h"
+#include "principal.h"
+#include "enemigo.h"
+
 class Nivel_2 {
 public:
     Nivel_2();
@@ -17,16 +22,16 @@ public:
     void reiniciarRonda();
     void gestionarCombate();
 
-    // ── Acceso al estado (usado por AgenteInteli::percibir) ───────────────────
+    // ── Acceso al estado (usado por Enemigo::percibir) ───────────────────
     float        getDistanciaEntrePersonajes() const;
     Accion       getUltimaAccionJugador()      const;
     bool         getTemblorActivo()            const;
-    int          getPuntosAgente()             const { return m_puntosAgenteInteli; }
+    int          getPuntosAgente()             const { return m_puntosEnemigo; }
     int          getPuntosJugador()            const { return m_puntosPrincipal; }
-    int          getToquesAgente()             const { return m_toquesAgenteInteli; }
+    int          getToquesAgente()             const { return m_toquesEnemigo; }
     int          getToquesJugador()            const { return m_toquesPrincipal; }
     Principal*   getJugador()                  const { return m_jugador; }
-    AgenteInteli* getAgenteInteli()                 const { return m_enemigo; }
+    Enemigo* getEnemigo()                 const { return m_enemigo; }
 
     // ── Condición de victoria ─────────────────────────────────────────────────
     bool nivelFinalizado() const { return m_finalizado; }
@@ -41,7 +46,7 @@ public:
 private:
     // ── Personajes ────────────────────────────────────────────────────────────
     Principal*    m_jugador;
-    AgenteInteli* m_enemigo;
+    Enemigo* m_enemigo;
 
     // ── Temblor ───────────────────────────────────────────────────────────────
     Temblor* m_temblor;
@@ -50,9 +55,9 @@ private:
 
     // ── Marcador ─────────────────────────────────────────────────────────────
     int   m_puntosPrincipal;
-    int   m_puntosAgenteInteli;
+    int   m_puntosEnemigo;
     int   m_toquesPrincipal;   // toques del jugador sobre el enemigo en el punto actual
-    int   m_toquesAgenteInteli;     // toques del enemigo sobre el jugador en el punto actual
+    int   m_toquesEnemigo;     // toques del enemigo sobre el jugador en el punto actual
     int   m_puntosParaGanar;
 
     // ── Estado del nivel ──────────────────────────────────────────────────────
