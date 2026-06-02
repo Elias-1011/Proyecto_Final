@@ -114,6 +114,12 @@ EscenaNivel1::EscenaNivel1(MainWindow* ventana, bool esDificil)
     sonidoImpacto->setSource(QUrl("qrc:/snd/recursos/sonido_impacto.mp3"));
     audioImpacto->setVolume(0.8f);
 
+    sonidoDanio = new QMediaPlayer(this);
+    audioDanio  = new QAudioOutput(this);
+    sonidoDanio->setAudioOutput(audioDanio);
+    sonidoDanio->setSource(QUrl("qrc:/snd/recursos/sonido_danio.mp3"));
+    audioDanio->setVolume(0.8f);
+
     temblorSonando = false;
 }
 
@@ -409,10 +415,10 @@ void EscenaNivel1::actualizarImpactos() {
 }
 
 void EscenaNivel1::actualizarHUD() {
-    short tiempo = nivel->getTiempo();
-    short rocas  = nivel->getRocasDestr();
-    short vidas  = nivel->getJugador().getVidas();
-    bool temblor = nivel->temblorActivo();
+    short tiempo  = nivel->getTiempo();
+    short rocas   = nivel->getRocasDestr();
+    short vidas   = nivel->getJugador().getVidas();
+    bool  temblor = nivel->temblorActivo();
 
     if (tiempo != hudTiempoAnterior) {
         textoTiempo->setPlainText(
@@ -428,6 +434,8 @@ void EscenaNivel1::actualizarHUD() {
     }
 
     if (vidas != hudVidasAnterior) {
+        if (vidas < hudVidasAnterior && hudVidasAnterior != -1)
+            sonidoDanio->play();
         textoVidas->setPlainText(
             "Vidas: " + QString::number(vidas));
         hudVidasAnterior = vidas;

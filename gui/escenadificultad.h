@@ -3,6 +3,8 @@
 
 #include <QGraphicsScene>
 #include <QPushButton>
+#include <QMediaPlayer>
+#include <QAudioOutput>
 
 class MainWindow;
 
@@ -23,6 +25,9 @@ private:
     QPushButton* btnFacil;
     QPushButton* btnDificil;
     QPushButton* btnVolver;
+
+    QMediaPlayer* musicaDificultad;
+    QAudioOutput* audioDificultad;
 
     void configurarBoton(QPushButton* btn, int x, int y);
 };

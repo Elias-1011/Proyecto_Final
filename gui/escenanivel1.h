@@ -71,6 +71,8 @@ private:
     QAudioOutput* audioAtaque;
     QMediaPlayer* sonidoImpacto;
     QAudioOutput* audioImpacto;
+    QMediaPlayer* sonidoDanio;
+    QAudioOutput* audioDanio;
 
     bool temblorSonando;
 

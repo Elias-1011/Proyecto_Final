@@ -6,7 +6,7 @@ MainWindow::MainWindow(QWidget* parent)
     escenaActual(nullptr)
 {
     setFixedSize(ANCHO, ALTO);
-    setWindowTitle("Igneos: Duelo Primordial");
+    setWindowTitle("ProyectoFinal Esgrima");
 
     view = new QGraphicsView(this);
     view->setFixedSize(ANCHO, ALTO);

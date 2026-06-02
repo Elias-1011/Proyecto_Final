@@ -40,9 +40,20 @@ EscenaDificultad::EscenaDificultad(MainWindow* ventana)
             this, &EscenaDificultad::elegirDificil);
     connect(btnVolver,  &QPushButton::clicked,
             this, &EscenaDificultad::volver);
+
+    musicaDificultad = new QMediaPlayer(this);
+    audioDificultad  = new QAudioOutput(this);
+    musicaDificultad->setAudioOutput(audioDificultad);
+    musicaDificultad->setSource(
+        QUrl("qrc:/snd/recursos/sonido_menu.mp3"));
+    audioDificultad->setVolume(0.6f);
+    musicaDificultad->setLoops(QMediaPlayer::Infinite);
+    musicaDificultad->play();
 }
 
-EscenaDificultad::~EscenaDificultad() {}
+EscenaDificultad::~EscenaDificultad() {
+    musicaDificultad->stop();
+}
 
 void EscenaDificultad::configurarBoton(QPushButton* btn, int x, int y) {
     btn->setFixedSize(200, 60);

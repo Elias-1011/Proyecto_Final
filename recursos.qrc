@@ -36,5 +36,6 @@
         <file>recursos/sonido_impacto.mp3</file>
         <file>recursos/sonido_victoria.mp3</file>
         <file>recursos/sonido_derrota.mp3</file>
+        <file>recursos/sonido_danio.mp3</file>
     </qresource>
 </RCC>
