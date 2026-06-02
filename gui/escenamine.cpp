@@ -28,9 +28,19 @@ EscenaMenu::EscenaMenu(MainWindow* ventana)
     connect(btnNivel1, &QPushButton::clicked, this, &EscenaMenu::irNivel1);
     connect(btnNivel2, &QPushButton::clicked, this, &EscenaMenu::irNivel2);
     connect(btnSalir,  &QPushButton::clicked, this, &EscenaMenu::salir);
+
+    musicaMenu = new QMediaPlayer(this);
+    audioMenu  = new QAudioOutput(this);
+    musicaMenu->setAudioOutput(audioMenu);
+    musicaMenu->setSource(QUrl("qrc:/snd/recursos/sonido_menu.mp3"));
+    audioMenu->setVolume(0.6f);
+    musicaMenu->setLoops(QMediaPlayer::Infinite);
+    musicaMenu->play();
 }
 
-EscenaMenu::~EscenaMenu() {}
+EscenaMenu::~EscenaMenu() {
+    musicaMenu->stop();
+}
 
 void EscenaMenu::configurarBoton(QPushButton* btn, const QString& texto,
                                  int x, int y) {

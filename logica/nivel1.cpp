@@ -14,7 +14,8 @@ Nivel1::Nivel1(Dificultad* dificultad, short tiempoSegundos)
     atacando(false),
     ultimoImpactoX(0.0f),
     ultimoImpactoY(0.0f),
-    hayImpactoNuevo(false)
+    hayImpactoNuevo(false),
+    pendienteTerminar(false)
 {
     if (!dificultad)
         throw invalid_argument("La dificultad no puede ser nula.");
@@ -48,6 +49,8 @@ void Nivel1::actualizar(float dt) {
 
     verificarColisionRocaJugador();
     limpiarInactivos();
+
+    if (pendienteTerminar) terminar();
 }
 
 void Nivel1::iniciarAtaque() {
@@ -67,8 +70,11 @@ void Nivel1::registrarImpacto(short idxRoca) {
     r->destruir();
     rocasDestruidas++;
     jugador->sumarPunto();
-    atacando = false;
+
+    if (rocasDestruidas >= dif->getRocasObjetivo())
+        pendienteTerminar = true;
 }
+
 
 void Nivel1::spawnRoca(float rx, float ry) {
     if (!activo) return;
@@ -131,7 +137,9 @@ void Nivel1::tickSegundo() {
 }
 
 void Nivel1::terminar() {
-    activo   = false;
-    atacando = false;
-    exito    = (rocasDestruidas >= dif->getRocasObjetivo());
+    activo            = false;
+    atacando          = false;
+    pendienteTerminar = false;
+    exito = (rocasDestruidas >= dif->getRocasObjetivo())
+            && jugador->estaVivo();
 }

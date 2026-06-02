@@ -4,6 +4,8 @@
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
 #include <QPushButton>
+#include <QMediaPlayer>
+#include <QAudioOutput>
 
 class MainWindow;
 
@@ -25,6 +27,9 @@ private:
     QPushButton*         btnNivel1;
     QPushButton*         btnNivel2;
     QPushButton*         btnSalir;
+
+    QMediaPlayer* musicaMenu;
+    QAudioOutput* audioMenu;
 
     void configurarBoton(QPushButton* btn, const QString& texto,
                          int x, int y);

@@ -13,7 +13,7 @@ EscenaTransicion::EscenaTransicion(MainWindow* ventana, bool esDificil)
     dificil(esDificil)
 {
     timer = new QTimer(this);
-    construir(":/img/recursos/transicion_inicio.png");
+    construir(":/img/recursos/transicion_inicio.png", "");
 }
 
 EscenaTransicion::EscenaTransicion(MainWindow* ventana, bool victoria, bool)
@@ -23,20 +23,37 @@ EscenaTransicion::EscenaTransicion(MainWindow* ventana, bool victoria, bool)
     dificil(false)
 {
     timer = new QTimer(this);
-    QString ruta = victoria ? ":/img/recursos/transicion_fin_victoria.png"
-                            : ":/img/recursos/transicion_fin_derrota.png";
-    construir(ruta);
+    QString rutaImg = victoria
+                          ? ":/img/recursos/transicion_fin_victoria.png"
+                          : ":/img/recursos/transicion_fin_derrota.png";
+    QString rutaSnd = victoria
+                          ? "qrc:/snd/recursos/sonido_victoria.mp3"
+                          : "qrc:/snd/recursos/sonido_derrota.mp3";
+    construir(rutaImg, rutaSnd);
 }
 
-EscenaTransicion::~EscenaTransicion() {}
+EscenaTransicion::~EscenaTransicion() {
+    if (sonido) sonido->stop();
+}
 
-void EscenaTransicion::construir(const QString& rutaImagen) {
+void EscenaTransicion::construir(const QString& rutaImagen,
+                                 const QString& rutaSonido) {
     QPixmap pix(rutaImagen);
     QGraphicsPixmapItem* img = addPixmap(
         pix.scaled(MainWindow::ANCHO, MainWindow::ALTO,
                    Qt::IgnoreAspectRatio, Qt::SmoothTransformation)
         );
     img->setZValue(0);
+
+    sonido = new QMediaPlayer(this);
+    audio  = new QAudioOutput(this);
+    sonido->setAudioOutput(audio);
+    audio->setVolume(0.8f);
+
+    if (!rutaSonido.isEmpty()) {
+        sonido->setSource(QUrl(rutaSonido));
+        sonido->play();
+    }
 
     connect(timer, &QTimer::timeout,
             this, &EscenaTransicion::avanzar);

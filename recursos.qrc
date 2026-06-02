@@ -28,4 +28,13 @@
         <file>recursos/transicion_fin_victoria.png</file>
         <file>recursos/transicion_fin_derrota.png</file>
     </qresource>
+    <qresource prefix="/snd">
+        <file>recursos/sonido_menu.mp3</file>
+        <file>recursos/sonido_nivel1.mp3</file>
+        <file>recursos/sonido_temblor.mp3</file>
+        <file>recursos/sonido_ataque.mp3</file>
+        <file>recursos/sonido_impacto.mp3</file>
+        <file>recursos/sonido_victoria.mp3</file>
+        <file>recursos/sonido_derrota.mp3</file>
+    </qresource>
 </RCC>

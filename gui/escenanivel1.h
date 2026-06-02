@@ -3,12 +3,12 @@
 
 #include <QGraphicsScene>
 #include <QGraphicsPixmapItem>
-#include <QGraphicsRectItem>
 #include <QGraphicsTextItem>
 #include <QTimer>
 #include <QKeyEvent>
 #include <QList>
-
+#include <QMediaPlayer>
+#include <QAudioOutput>
 #include "nivel1.h"
 #include "dificultadfacil.h"
 #include "dificultaddificil.h"
@@ -55,12 +55,25 @@ private:
     QGraphicsPixmapItem*        itemFondo;
     QGraphicsPixmapItem*        itemJugador;
     QList<QGraphicsPixmapItem*> itemsRocas;
+    QList<short>                frameRocaAnterior;
     QList<EfectoImpacto>        impactos;
 
     QGraphicsTextItem* textoTiempo;
     QGraphicsTextItem* textoRocas;
     QGraphicsTextItem* textoVidas;
     QGraphicsTextItem* textoTemblor;
+
+    QMediaPlayer* musicaNivel;
+    QAudioOutput* audioNivel;
+    QMediaPlayer* sonidoTemblor;
+    QAudioOutput* audioTemblor;
+    QMediaPlayer* sonidoAtaque;
+    QAudioOutput* audioAtaque;
+    QMediaPlayer* sonidoImpacto;
+    QAudioOutput* audioImpacto;
+
+    bool temblorSonando;
+
 
     Direccion dirActual;
     short     frameActual;
@@ -71,8 +84,15 @@ private:
     QTimer* timerSpawn;
     QTimer* timerTemblor;
     QTimer* timerSegundo;
+    QTimer* timerCooldownAtaque;
 
+    bool   puedeAtacar;
     qint64 ultimoMs;
+
+    short hudTiempoAnterior;
+    short hudRocasAnterior;
+    short hudVidasAnterior;
+    bool  hudTemborAnterior;
 
     void cargarSprites();
     void actualizarJugadorGrafico();
@@ -87,13 +107,13 @@ private:
     short    getIdxDireccion()           const;
 
     static constexpr short TAM_JUGADOR     = 64;
-    static constexpr short TAM_ATAQUE      = 120;
+    static constexpr short TAM_ATAQUE      = 80;
     static constexpr short TAM_ROCA_BASE   = 20;
     static constexpr short TAM_ROCA_MAX    = 80;
     static constexpr short TICKS_POR_FRAME = 8;
     static constexpr short TICKS_IMPACTO   = 18;
     static constexpr short TICKS_ATAQUE    = 12;
-    static constexpr float RANGO_ATAQUE = 70.0f;
+    static constexpr float RANGO_ATAQUE    = 70.0f;
 };
 
 #endif

@@ -3,6 +3,8 @@
 
 #include <QGraphicsScene>
 #include <QTimer>
+#include <QMediaPlayer>
+#include <QAudioOutput>
 
 class MainWindow;
 
@@ -29,7 +31,10 @@ private:
     TipoTransicion tipo;
     bool           dificil;
 
-    void construir(const QString& rutaImagen);
+    QMediaPlayer* sonido;
+    QAudioOutput* audio;
+
+    void construir(const QString& rutaImagen, const QString& rutaSonido);
 };
 
 #endif

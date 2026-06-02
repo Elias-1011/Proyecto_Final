@@ -11,11 +11,17 @@ using namespace std;
 
 EscenaNivel1::EscenaNivel1(MainWindow* ventana, bool esDificil)
     : QGraphicsScene(0, 0, MainWindow::ANCHO, MainWindow::ALTO),
-      ventana(ventana),
-      dirActual(Direccion::Abajo),
-      frameActual(0),
-      ticksAnimacion(0),
-      ticksAtaqueVisible(0)
+    ventana(ventana),
+    dirActual(Direccion::Abajo),
+    frameActual(0),
+    ticksAnimacion(0),
+    ticksAtaqueVisible(0),
+    puedeAtacar(true),
+    ultimoMs(0),
+    hudTiempoAnterior(-1),
+    hudRocasAnterior(-1),
+    hudVidasAnterior(-1),
+    hudTemborAnterior(false)
 {
     dif   = esDificil ? (Dificultad*) new DificultadDificil()
                       : (Dificultad*) new DificultadFacil();
@@ -77,9 +83,42 @@ EscenaNivel1::EscenaNivel1(MainWindow* ventana, bool esDificil)
     connect(timerSegundo, &QTimer::timeout,
             this, &EscenaNivel1::tickSegundo);
     timerSegundo->start(1000);
+
+    timerCooldownAtaque = new QTimer(this);
+    timerCooldownAtaque->setSingleShot(true);
+    connect(timerCooldownAtaque, &QTimer::timeout,
+            this, [this]() { puedeAtacar = true; });
+    musicaNivel = new QMediaPlayer(this);
+    audioNivel  = new QAudioOutput(this);
+    musicaNivel->setAudioOutput(audioNivel);
+    musicaNivel->setSource(QUrl("qrc:/snd/recursos/sonido_nivel1.mp3"));
+    audioNivel->setVolume(0.5f);
+    musicaNivel->setLoops(QMediaPlayer::Infinite);
+    musicaNivel->play();
+
+    sonidoTemblor = new QMediaPlayer(this);
+    audioTemblor  = new QAudioOutput(this);
+    sonidoTemblor->setAudioOutput(audioTemblor);
+    sonidoTemblor->setSource(QUrl("qrc:/snd/recursos/sonido_temblor.mp3"));
+    audioTemblor->setVolume(0.7f);
+
+    sonidoAtaque = new QMediaPlayer(this);
+    audioAtaque  = new QAudioOutput(this);
+    sonidoAtaque->setAudioOutput(audioAtaque);
+    sonidoAtaque->setSource(QUrl("qrc:/snd/recursos/sonido_ataque.mp3"));
+    audioAtaque->setVolume(0.8f);
+
+    sonidoImpacto = new QMediaPlayer(this);
+    audioImpacto  = new QAudioOutput(this);
+    sonidoImpacto->setAudioOutput(audioImpacto);
+    sonidoImpacto->setSource(QUrl("qrc:/snd/recursos/sonido_impacto.mp3"));
+    audioImpacto->setVolume(0.8f);
+
+    temblorSonando = false;
 }
 
 EscenaNivel1::~EscenaNivel1() {
+    musicaNivel->stop();
     delete nivel;
     delete dif;
 }
@@ -132,6 +171,8 @@ void EscenaNivel1::cargarSprites() {
 }
 
 void EscenaNivel1::keyPressEvent(QKeyEvent* e) {
+    if (e->isAutoRepeat()) return;
+
     switch (e->key()) {
     case Qt::Key_W:
         nivel->moverJugador(true, false, false, false);
@@ -150,9 +191,12 @@ void EscenaNivel1::keyPressEvent(QKeyEvent* e) {
         dirActual = Direccion::Derecha;
         break;
     case Qt::Key_Space:
-        if (!nivel->estaAtacando()) {
+        if (puedeAtacar && ticksAtaqueVisible == 0) {
+            puedeAtacar = false;
+            timerCooldownAtaque->start(1200);
             nivel->iniciarAtaque();
             ticksAtaqueVisible = TICKS_ATAQUE;
+            sonidoAtaque->play();
             verificarColisionAtaqueRoca();
         }
         break;
@@ -162,12 +206,16 @@ void EscenaNivel1::keyPressEvent(QKeyEvent* e) {
 }
 
 void EscenaNivel1::keyReleaseEvent(QKeyEvent* e) {
+    if (e->isAutoRepeat()) return;
     switch (e->key()) {
-    case Qt::Key_W: nivel->moverJugador(false, false, false, false); break;
-    case Qt::Key_S: nivel->moverJugador(false, false, false, false); break;
-    case Qt::Key_A: nivel->moverJugador(false, false, false, false); break;
-    case Qt::Key_D: nivel->moverJugador(false, false, false, false); break;
-    default: break;
+    case Qt::Key_W:
+    case Qt::Key_S:
+    case Qt::Key_A:
+    case Qt::Key_D:
+        nivel->moverJugador(false, false, false, false);
+        break;
+    default:
+        break;
     }
 }
 
@@ -198,8 +246,10 @@ void EscenaNivel1::spawnRocaAleatoria() {
 }
 
 void EscenaNivel1::dispararTemblor() {
-    if (!nivel->nivelTerminado())
+    if (!nivel->nivelTerminado()) {
         nivel->activarTemblor();
+        sonidoTemblor->play();
+    }
 }
 
 void EscenaNivel1::tickSegundo() {
@@ -210,6 +260,7 @@ void EscenaNivel1::tickSegundo() {
             timerSpawn->stop();
             timerTemblor->stop();
             timerSegundo->stop();
+            timerCooldownAtaque->stop();
             bool exitoso     = nivel->fueExitoso();
             MainWindow* vent = ventana;
             QTimer::singleShot(100, vent, [vent, exitoso]() {
@@ -309,6 +360,7 @@ void EscenaNivel1::sincronizarRocas() {
         itemImp->setZValue(3);
         impactos.append({itemImp, TICKS_IMPACTO});
         nivel->resetImpacto();
+        sonidoImpacto->play();
     }
 
     const vector<Roca*>& rocas = nivel->getRocas();
@@ -317,15 +369,17 @@ void EscenaNivel1::sincronizarRocas() {
         QGraphicsPixmapItem* item = addPixmap(QPixmap());
         item->setZValue(1);
         itemsRocas.append(item);
+        frameRocaAnterior.append(-1);
     }
 
     for (int i = 0; i < (int)rocas.size(); i++) {
         const Roca* r = rocas[i];
         short       f = getFrameRoca(r);
         short       t = (short)r->getTamano();
-
-        if (itemsRocas[i]->pixmap().width() != sprRocas[f].width())
+        if (f != frameRocaAnterior[i]) {
             itemsRocas[i]->setPixmap(sprRocas[f]);
+            frameRocaAnterior[i] = f;
+        }
 
         itemsRocas[i]->setPos(r->getX() - t / 2,
                                r->getY() - t / 2);
@@ -335,7 +389,6 @@ void EscenaNivel1::sincronizarRocas() {
     for (int i = (int)rocas.size(); i < itemsRocas.size(); i++)
         itemsRocas[i]->setVisible(false);
 }
-
 
 void EscenaNivel1::actualizarImpactos() {
     for (EfectoImpacto& ef : impactos)
@@ -356,15 +409,35 @@ void EscenaNivel1::actualizarImpactos() {
 }
 
 void EscenaNivel1::actualizarHUD() {
-    textoTiempo->setPlainText(
-        "Tiempo: " + QString::number(nivel->getTiempo()) + "s");
-    textoRocas->setPlainText(
-        "Rocas: "  + QString::number(nivel->getRocasDestr()) +
-        " / "      + QString::number(nivel->getRocasObj()));
-    textoVidas->setPlainText(
-        "Vidas: "  + QString::number(nivel->getJugador().getVidas()));
-    textoTemblor->setPlainText(
-        nivel->getOffsetX() != 0.0f ? "TEMBLOR SISMICO!" : "");
+    short tiempo = nivel->getTiempo();
+    short rocas  = nivel->getRocasDestr();
+    short vidas  = nivel->getJugador().getVidas();
+    bool temblor = nivel->temblorActivo();
+
+    if (tiempo != hudTiempoAnterior) {
+        textoTiempo->setPlainText(
+            "Tiempo: " + QString::number(tiempo) + "s");
+        hudTiempoAnterior = tiempo;
+    }
+
+    if (rocas != hudRocasAnterior) {
+        textoRocas->setPlainText(
+            "Rocas: " + QString::number(rocas) +
+            " / "     + QString::number(nivel->getRocasObj()));
+        hudRocasAnterior = rocas;
+    }
+
+    if (vidas != hudVidasAnterior) {
+        textoVidas->setPlainText(
+            "Vidas: " + QString::number(vidas));
+        hudVidasAnterior = vidas;
+    }
+
+    if (temblor != hudTemborAnterior) {
+        textoTemblor->setPlainText(
+            temblor ? "TEMBLOR SISMICO!" : "");
+        hudTemborAnterior = temblor;
+    }
 }
 
 void EscenaNivel1::verificarFin() {
@@ -374,6 +447,7 @@ void EscenaNivel1::verificarFin() {
     timerSpawn->stop();
     timerTemblor->stop();
     timerSegundo->stop();
+    timerCooldownAtaque->stop();
 
     bool exitoso     = nivel->fueExitoso();
     MainWindow* vent = ventana;

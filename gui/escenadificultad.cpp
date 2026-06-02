@@ -4,6 +4,7 @@
 #include "escenamine.h"
 #include <QGraphicsProxyWidget>
 #include <QGraphicsTextItem>
+#include <QGraphicsPixmapItem>
 #include <QFont>
 
 using namespace std;
@@ -12,12 +13,18 @@ EscenaDificultad::EscenaDificultad(MainWindow* ventana)
     : QGraphicsScene(0, 0, MainWindow::ANCHO, MainWindow::ALTO),
     ventana(ventana)
 {
-    setBackgroundBrush(QColor(20, 10, 5));
+    QGraphicsPixmapItem* fondo = addPixmap(
+        QPixmap(":/img/recursos/fondo_menu.png").scaled(
+            MainWindow::ANCHO, MainWindow::ALTO,
+            Qt::IgnoreAspectRatio, Qt::SmoothTransformation)
+        );
+    fondo->setZValue(0);
 
     QGraphicsTextItem* titulo = addText("Selecciona la dificultad");
     titulo->setDefaultTextColor(QColor(255, 102, 0));
     titulo->setFont(QFont("Arial", 26, QFont::Bold));
     titulo->setPos(200, 180);
+    titulo->setZValue(1);
 
     btnFacil   = new QPushButton("Facil");
     btnDificil = new QPushButton("Dificil");
@@ -55,7 +62,7 @@ void EscenaDificultad::configurarBoton(QPushButton* btn, int x, int y) {
         );
     QGraphicsProxyWidget* proxy = addWidget(btn);
     proxy->setPos(x, y);
-    proxy->setZValue(1);
+    proxy->setZValue(2);
 }
 
 void EscenaDificultad::elegirFacil() {

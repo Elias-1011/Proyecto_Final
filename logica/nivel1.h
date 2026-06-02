@@ -21,9 +21,9 @@ public:
     void moverJugador(bool arriba, bool abajo,
                       bool izquierda, bool derecha);
     void iniciarAtaque();
-    bool estaAtacando()  const { return atacando; }
     void registrarImpacto(short idxRoca);
 
+    bool debeTerminar() const { return pendienteTerminar; }
     bool  nivelTerminado() const { return !activo;                       }
     bool  fueExitoso()     const { return exito;                         }
     short getTiempo()      const { return tiempoRestante;                }
@@ -38,6 +38,7 @@ public:
     float getImpactoY()   const { return ultimoImpactoY;   }
     void  resetImpacto()        { hayImpactoNuevo = false; }
     void finalizarAtaque() { atacando = false; }
+    bool temblorActivo() const { return temblor->estaActivo(); }
 
     const Jugador&       getJugador() const { return *jugador; }
     const vector<Roca*>& getRocas()   const { return rocas;    }
@@ -61,6 +62,7 @@ private:
     void verificarColisionRocaJugador();
     void limpiarInactivos();
     void terminar();
+    bool pendienteTerminar;
 
     static constexpr float RADIO_JUGADOR = 20.0f;
 };
