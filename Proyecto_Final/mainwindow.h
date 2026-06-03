@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+class GameWidget;
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -19,5 +21,7 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    GameWidget *m_game;
 };
+
 #endif // MAINWINDOW_H

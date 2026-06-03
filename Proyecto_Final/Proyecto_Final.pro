@@ -1,4 +1,4 @@
-QT       += core gui
+QT += core gui widgets multimedia
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     enemigo.cpp \
+    gamewidget.cpp \
     main.cpp \
     mainwindow.cpp \
     nivel2.cpp \
@@ -20,6 +21,7 @@ SOURCES += \
 HEADERS += \
     enemigo.h \
     enums.h \
+    gamewidget.h \
     mainwindow.h \
     nivel2.h \
     perfilJugador.h \

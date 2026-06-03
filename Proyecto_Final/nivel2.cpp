@@ -48,7 +48,6 @@ void Nivel_2::actualizar(float dt) {
     m_jugador->actualizar(dt);
     m_enemigo->actualizar(dt);
 
-    // Temblor periódico
     m_tiempoHasteTemblor -= dt;
     if (m_tiempoHasteTemblor <= 0.0f) {
         m_temblor->iniciar();
@@ -66,49 +65,53 @@ void Nivel_2::actualizar(float dt) {
     gestionarCombate();
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Detección de toques — basada en embestida, no en proyectil
-//
-// Un toque es válido cuando el personaje que embiste se solapa con el oponente.
-// "Solapar" = la distancia entre sus centros es menor que la suma de
-// sus medios-hitbox (rangoAtaque / 2 de cada uno).
-// ─────────────────────────────────────────────────────────────────────────────
 void Nivel_2::detectarToques() {
     float dist = getDistanciaEntrePersonajes();
 
-    // Hitbox combinado: medio hitbox del atacante + radio del receptor (30px fijo)
     const float RADIO_RECEPTOR = 30.0f;
 
     // ── Jugador embiste al enemigo ────────────────────────────────────────────
     if (m_jugador->estaEmbistiendo() && !m_jugador->yaGolpeoEnEstaEmbestida()) {
-        float hitbox = m_jugador->getRangoAtaque() / 2.0f + RADIO_RECEPTOR;
-        if (dist <= hitbox) {
-            m_jugador->marcarGolpe();
-            m_toquesPrincipal++;
-            float dirRetroceso = (m_jugador->getX() < m_enemigo->getX()) ? 1.0f : -1.0f;
-            bool puntoCompleto = m_enemigo->recibirImpacto(dirRetroceso, m_toquesPrincipal);
 
-            if (puntoCompleto) {
-                m_puntosPrincipal++;
-                m_enemigo->aprender();
-                reiniciarRonda();
+        // Inmune si: esquiva, o está subiendo en el salto (velY < 0)
+        bool enemigoInmune = m_enemigo->estaEsquivando() ||
+                             (!m_enemigo->estaEnSuelo() && m_enemigo->getVelY() < 0.0f);
+
+        if (!enemigoInmune) {
+            float hitbox = m_jugador->getRangoAtaque() / 2.0f + RADIO_RECEPTOR;
+            if (dist <= hitbox) {
+                m_jugador->marcarGolpe();
+                m_toquesPrincipal++;
+                float dirRetroceso = (m_jugador->getX() < m_enemigo->getX()) ? 1.0f : -1.0f;
+                bool puntoCompleto = m_enemigo->recibirImpacto(dirRetroceso, m_toquesPrincipal);
+                if (puntoCompleto) {
+                    m_puntosPrincipal++;
+                    m_enemigo->aprender();
+                    reiniciarRonda();
+                }
             }
         }
     }
 
     // ── Agente embiste al jugador ─────────────────────────────────────────────
     if (m_enemigo->estaEmbistiendo() && !m_enemigo->yaGolpeoEnEstaEmbestida()) {
-        float hitbox = m_enemigo->getRangoAtaque() / 2.0f + RADIO_RECEPTOR;
-        if (dist <= hitbox) {
-            m_enemigo->marcarGolpe();
-            m_toquesEnemigo++;
-            float dirRetroceso = (m_enemigo->getX() < m_jugador->getX()) ? 1.0f : -1.0f;
-            bool puntoCompleto = m_jugador->recibirImpacto(dirRetroceso, m_toquesEnemigo);
 
-            if (puntoCompleto) {
-                m_puntosEnemigo++;
-                m_enemigo->aprender();
-                reiniciarRonda();
+        // Inmune si: esquiva, o está subiendo en el salto (velY < 0)
+        bool jugadorInmune = m_jugador->estaEsquivando() ||
+                             (!m_jugador->estaEnSuelo() && m_jugador->getVelY() < 0.0f);
+
+        if (!jugadorInmune) {
+            float hitbox = m_enemigo->getRangoAtaque() / 2.0f + RADIO_RECEPTOR;
+            if (dist <= hitbox) {
+                m_enemigo->marcarGolpe();
+                m_toquesEnemigo++;
+                float dirRetroceso = (m_enemigo->getX() < m_jugador->getX()) ? 1.0f : -1.0f;
+                bool puntoCompleto = m_jugador->recibirImpacto(dirRetroceso, m_toquesEnemigo);
+                if (puntoCompleto) {
+                    m_puntosEnemigo++;
+                    m_enemigo->aprender();
+                    reiniciarRonda();
+                }
             }
         }
     }
@@ -117,8 +120,15 @@ void Nivel_2::detectarToques() {
 void Nivel_2::reiniciarRonda() {
     m_toquesPrincipal = 0;
     m_toquesEnemigo   = 0;
-    if (m_jugador) m_jugador->reiniciarBarra();
-    if (m_enemigo) m_enemigo->reiniciarBarra();
+
+    if (m_jugador) {
+        m_jugador->reiniciarBarra();
+        m_jugador->setPosicion(150.0f, 500.0f);
+    }
+    if (m_enemigo) {
+        m_enemigo->reiniciarBarra();
+        m_enemigo->setPosicion(650.0f, 500.0f);
+    }
 }
 
 void Nivel_2::gestionarCombate() {
@@ -147,5 +157,15 @@ bool Nivel_2::getTemblorActivo() const {
 }
 
 void Nivel_2::limitarPersonajesEnPlataforma() {
-    // Se implementa con setX() al integrar Qt
+    if (!m_jugador || !m_enemigo) return;
+
+    if (m_jugador->getX() < m_xMinPlataforma)
+        m_jugador->setX(m_xMinPlataforma);
+    if (m_jugador->getX() > m_xMaxPlataforma)
+        m_jugador->setX(m_xMaxPlataforma);
+
+    if (m_enemigo->getX() < m_xMinPlataforma)
+        m_enemigo->setX(m_xMinPlataforma);
+    if (m_enemigo->getX() > m_xMaxPlataforma)
+        m_enemigo->setX(m_xMaxPlataforma);
 }

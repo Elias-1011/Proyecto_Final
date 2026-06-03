@@ -15,17 +15,16 @@ class Principal : public Personaje {
 public:
     Principal(float x, float y);
 
-    // Referencia al InputManager; Nivel_2 lo actualiza con eventos de teclado
     InputManager* input;
 
-    // Procesa el InputManager y ejecuta las acciones físicas correspondientes
     void procesarEntrada() override;
 
-    // Última dirección de movimiento (para saber hacia dónde esquivar/atacar)
     float getDireccion() const { return m_ultimaDireccion; }
 
+    bool estaMoviendose() const;
+
 private:
-    float m_ultimaDireccion; // +1.0 derecha, -1.0 izquierda
+    float m_ultimaDireccion;
 };
 
 #endif // PRINCIPAL_H
