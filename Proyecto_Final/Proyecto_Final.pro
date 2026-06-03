@@ -16,6 +16,7 @@ SOURCES += \
     nivel2.cpp \
     personaje.cpp \
     principal.cpp \
+    soundmanager.cpp \
     temblor.cpp
 
 HEADERS += \
@@ -27,6 +28,7 @@ HEADERS += \
     perfilJugador.h \
     personaje.h \
     principal.h \
+    soundmanager.h \
     temblor.h
 
 FORMS += \

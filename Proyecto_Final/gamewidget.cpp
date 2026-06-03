@@ -283,15 +283,6 @@ void GameWidget::dibujarHUD(QPainter& p) {
         p.drawText(QRect(0, height()-28, width(), 22),
                    Qt::AlignCenter, "⚠  TEMBLOR SÍSMICO  ⚠");
     }
-
-    p.setBrush(QColor(0,0,0,100)); p.setPen(Qt::NoPen);
-    p.drawRoundedRect(8, height()-72, 185, 64, 6, 6);
-    p.setFont(QFont("Courier New", 8));
-    p.setPen(QColor(180,180,180));
-    p.drawText(14, height()-54, "A / D     → mover");
-    p.drawText(14, height()-40, "W         → saltar");
-    p.drawText(14, height()-26, "SHIFT     → esquivar");
-    p.drawText(14, height()-12, "ESPACIO   → embestir");
 }
 
 void GameWidget::dibujarBarraToques(QPainter& p, int toques,
