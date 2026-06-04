@@ -19,4 +19,6 @@ EsgrimaPrimordial
 
 # IDE
 .idea/
-.vscode/
+.vscode/debug/
+release/
+Makefile*
