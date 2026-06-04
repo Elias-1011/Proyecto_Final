@@ -70,7 +70,7 @@ void Nivel_2::detectarToques() {
 
     const float RADIO_RECEPTOR = 30.0f;
 
-    // ── Jugador embiste al enemigo ────────────────────────────────────────────
+    // Jugador embiste al enemigo
     if (m_jugador->estaEmbistiendo() && !m_jugador->yaGolpeoEnEstaEmbestida()) {
 
         // Inmune si: esquiva, o está subiendo en el salto (velY < 0)
@@ -93,7 +93,7 @@ void Nivel_2::detectarToques() {
         }
     }
 
-    // ── Agente embiste al jugador ─────────────────────────────────────────────
+    // Agente embiste al jugador
     if (m_enemigo->estaEmbistiendo() && !m_enemigo->yaGolpeoEnEstaEmbestida()) {
 
         // Inmune si: esquiva, o está subiendo en el salto (velY < 0)
@@ -140,7 +140,6 @@ void Nivel_2::gestionarCombate() {
 }
 
 void Nivel_2::finalizar() {
-    // Al integrar Qt: emitir señal al objeto Juego con el resultado
 }
 
 float Nivel_2::getDistanciaEntrePersonajes() const {

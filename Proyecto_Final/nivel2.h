@@ -14,15 +14,10 @@ public:
     void iniciar();
     void actualizar(float dt);
     void finalizar();
-
-    // ── Detección de impactos ─────────────────────────────────────────────────
     void detectarToques();
-
-    // ── Gestión de combate ────────────────────────────────────────────────────
     void reiniciarRonda();
     void gestionarCombate();
 
-    // ── Acceso al estado (usado por Enemigo::percibir) ───────────────────
     float        getDistanciaEntrePersonajes() const;
     Accion       getUltimaAccionJugador()      const;
     bool         getTemblorActivo()            const;
@@ -33,41 +28,32 @@ public:
     Principal*   getJugador()                  const { return m_jugador; }
     Enemigo* getEnemigo()                 const { return m_enemigo; }
 
-    // ── Condición de victoria ─────────────────────────────────────────────────
     bool nivelFinalizado() const { return m_finalizado; }
     bool jugadorGano()     const { return m_puntosPrincipal >= m_puntosParaGanar; }
 
-    // ── InputManager (Nivel_2 lo actualiza con eventos Qt) ────────────────────
     InputManager& getInput() { return m_input; }
 
-    // ── Última acción del jugador (para el agente) ────────────────────────────
     void registrarAccionJugador(Accion a) { m_ultimaAccionJugador = a; }
 
 private:
-    // ── Personajes ────────────────────────────────────────────────────────────
     Principal*    m_jugador;
     Enemigo* m_enemigo;
 
-    // ── Temblor ───────────────────────────────────────────────────────────────
     Temblor* m_temblor;
     float    m_tiempoHasteTemblor;   // segundos hasta el próximo temblor
     float    m_intervaloTemblor;     // segundos entre temblores
 
-    // ── Marcador ─────────────────────────────────────────────────────────────
     int   m_puntosPrincipal;
     int   m_puntosEnemigo;
     int   m_toquesPrincipal;   // toques del jugador sobre el enemigo en el punto actual
     int   m_toquesEnemigo;     // toques del enemigo sobre el jugador en el punto actual
     int   m_puntosParaGanar;
 
-    // ── Estado del nivel ──────────────────────────────────────────────────────
     bool  m_finalizado;
     Accion m_ultimaAccionJugador;
 
-    // ── Input ─────────────────────────────────────────────────────────────────
     InputManager m_input;
 
-    // ── Límites de la plataforma ──────────────────────────────────────────────
     float m_xMinPlataforma;
     float m_xMaxPlataforma;
 

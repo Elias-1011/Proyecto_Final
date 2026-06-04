@@ -9,6 +9,10 @@ GameWidget::GameWidget(QWidget *parent)
     , m_enemyTimer(0.0f)
     , m_enemyAtacando(false)
     , m_enemyDireccion(-1)
+    , m_enTransicion(true)
+    , m_tiempoTransicion(0.0f)
+    , m_duracionTransicion(3.0f)
+    , m_rondaActual(1)
     , m_jugadorEmbistioAntes(false)
     , m_jugadorSaltoAntes(true)
     , m_jugadorEsquivoAntes(false)
@@ -20,28 +24,30 @@ GameWidget::GameWidget(QWidget *parent)
     setFocusPolicy(Qt::StrongFocus);
     m_nivel->iniciar();
 
-    // ── Fondo ────────────────────────────────────────────────────────────────
     m_fondo.load("Sprites/Fondo/fondo.png");
     m_imgVictoria.load("Sprites/Fondo/victoria.png");
     m_imgDerrota.load("Sprites/Fondo/derrota.png");
 
-    // ── Jugador sprites ───────────────────────────────────────────────────────
+    m_imgRondas.push_back(QPixmap("Sprites/Fondo/ronda1.png"));
+    m_imgRondas.push_back(QPixmap("Sprites/Fondo/ronda2.png"));
+    m_imgRondas.push_back(QPixmap("Sprites/Fondo/ronda3.png"));
+    m_imgRondas.push_back(QPixmap("Sprites/Fondo/ronda4.png"));
+    m_imgRondas.push_back(QPixmap("Sprites/Fondo/ronda5.png"));
+
     for (int i = 1; i <= 6; i++)
         m_walkDerecha.push_back(QPixmap(QString("Sprites/Jugador/walk%1.png").arg(i)));
     m_jumpSprites.push_back(QPixmap("Sprites/Jugador/jump1.png"));
     m_attackSprites.push_back(QPixmap("Sprites/Jugador/ataque1.png"));
     m_idleSprites.push_back(QPixmap("Sprites/Jugador/walk1.png"));
 
-    // ── Enemigo sprites ───────────────────────────────────────────────────────
     for (int i = 1; i <= 6; i++)
-        m_enemyWalk.push_back(QPixmap(QString("Sprites/Enemigo/walk%1.png").arg(i)));
-    m_enemyAttack.push_back(QPixmap("Sprites/Enemigo/ataque1.png"));
-    m_enemyIdle.push_back(QPixmap("Sprites/Enemigo/walk1.png"));
+        m_enemyWalk.push_back(QPixmap(QString("Sprites/Enemigo/Walk%1.png").arg(i)));
+    m_enemyAttack.push_back(QPixmap("Sprites/Enemigo/Ataque.png"));
+    m_enemyIdle.push_back(QPixmap("Sprites/Enemigo/Walk1.png"));
+    m_enemyJump.push_back(QPixmap("Sprites/Enemigo/Saltar.png"));
 
-    // ── Música ────────────────────────────────────────────────────────────────
     m_sonidos.playMusica();
 
-    // ── Timer ────────────────────────────────────────────────────────────────
     connect(&m_timer, &QTimer::timeout, this, &GameWidget::gameLoop);
     m_timer.start(16);
 }
@@ -61,46 +67,55 @@ QPixmap GameWidget::fallback(int w, int h, QColor color) const {
     return px;
 }
 
+void GameWidget::iniciarTransicion() {
+    m_enTransicion    = true;
+    m_tiempoTransicion = 0.0f;
+}
+
 void GameWidget::gameLoop() {
     const float dt = 0.016f;
+
+    if (m_enTransicion) {
+        m_tiempoTransicion += dt;
+        if (m_tiempoTransicion >= m_duracionTransicion) {
+            m_enTransicion = false;
+        }
+        update();
+        return;
+    }
 
     Principal* jugador = m_nivel->getJugador();
     Enemigo*   enemigo = m_nivel->getEnemigo();
     if (!jugador || !enemigo) return;
 
-    // ── Capturar estado ANTES de actualizar ───────────────────────────────────
     bool jugadorEmbistiendo = jugador->estaEmbistiendo();
-    bool jugadorEnSuelo     = jugador->estaEnSuelo();
-    bool jugadorEsquivando  = jugador->estaEsquivando();
     bool enemigoEmbistiendo = enemigo->estaEmbistiendo();
     int  puntosJugador      = m_nivel->getPuntosJugador();
     int  puntosEnemigo      = m_nivel->getPuntosAgente();
 
     m_nivel->actualizar(dt);
 
-    // ── Detectar cambios de estado para disparar sonidos ─────────────────────
-
-    // Embestida jugador — sonido al iniciar
     if (jugador->estaEmbistiendo() && !m_jugadorEmbistioAntes)
         m_sonidos.playEmbestida();
 
-    // Embestida enemigo — sonido al iniciar
     if (enemigo->estaEmbistiendo() && !m_enemigoEmbistioAntes)
         m_sonidos.playEmbestida();
 
-    // Salto jugador — sonido al despegar
     if (!jugador->estaEnSuelo() && m_jugadorSaltoAntes)
         m_sonidos.playSalto();
 
-    // Esquive jugador — sonido al iniciar
     if (jugador->estaEsquivando() && !m_jugadorEsquivoAntes)
         m_sonidos.playEsquive();
 
-    // Golpe — sonido cuando cambia el marcador de toques
-    // (significa que una embestida conectó)
     if (m_nivel->getPuntosJugador() != puntosJugador ||
         m_nivel->getPuntosAgente()  != puntosEnemigo) {
         m_sonidos.playPunto();
+
+        if (!m_nivel->nivelFinalizado()) {
+            m_rondaActual++;
+            if (m_rondaActual <= m_imgRondas.size())
+                iniciarTransicion();
+        }
     } else if (m_nivel->getToquesJugador() > 0 &&
                jugadorEmbistiendo && !jugador->estaEmbistiendo()) {
         m_sonidos.playGolpe();
@@ -109,7 +124,6 @@ void GameWidget::gameLoop() {
         m_sonidos.playGolpe();
     }
 
-    // Victoria / derrota — sonido al finalizar el nivel
     if (m_nivel->nivelFinalizado() && !m_nivelFinalizadoAntes) {
         m_sonidos.stopMusica();
         if (m_nivel->jugadorGano())
@@ -118,23 +132,22 @@ void GameWidget::gameLoop() {
             m_sonidos.playDerrota();
     }
 
-    // ── Guardar estado actual para el próximo frame ───────────────────────────
-    m_jugadorEmbistioAntes  = jugador->estaEmbistiendo();
-    m_jugadorSaltoAntes     = jugador->estaEnSuelo();
-    m_jugadorEsquivoAntes   = jugador->estaEsquivando();
-    m_enemigoEmbistioAntes  = enemigo->estaEmbistiendo();
-    m_puntosJugadorAntes    = m_nivel->getPuntosJugador();
-    m_puntosEnemigoAntes    = m_nivel->getPuntosAgente();
-    m_nivelFinalizadoAntes  = m_nivel->nivelFinalizado();
+    m_jugadorEmbistioAntes = jugador->estaEmbistiendo();
+    m_jugadorSaltoAntes    = jugador->estaEnSuelo();
+    m_jugadorEsquivoAntes  = jugador->estaEsquivando();
+    m_enemigoEmbistioAntes = enemigo->estaEmbistiendo();
+    m_puntosJugadorAntes   = m_nivel->getPuntosJugador();
+    m_puntosEnemigoAntes   = m_nivel->getPuntosAgente();
+    m_nivelFinalizadoAntes = m_nivel->nivelFinalizado();
 
-    // ── Animaciones ───────────────────────────────────────────────────────────
-    if (m_walkDerecha.isEmpty())  m_walkDerecha.push_back(fallback(128,128,QColor(70,130,180)));
-    if (m_jumpSprites.isEmpty())  m_jumpSprites.push_back(fallback(128,128,QColor(70,130,180)));
-    if (m_attackSprites.isEmpty())m_attackSprites.push_back(fallback(128,128,QColor(70,130,180)));
-    if (m_idleSprites.isEmpty())  m_idleSprites.push_back(fallback(128,128,QColor(70,130,180)));
-    if (m_enemyWalk.isEmpty())    m_enemyWalk.push_back(fallback(128,128,QColor(180,60,60)));
-    if (m_enemyAttack.isEmpty())  m_enemyAttack.push_back(fallback(128,128,QColor(180,60,60)));
-    if (m_enemyIdle.isEmpty())    m_enemyIdle.push_back(fallback(128,128,QColor(180,60,60)));
+    if (m_walkDerecha.isEmpty())   m_walkDerecha.push_back(fallback(128,128,QColor(70,130,180)));
+    if (m_jumpSprites.isEmpty())   m_jumpSprites.push_back(fallback(128,128,QColor(70,130,180)));
+    if (m_attackSprites.isEmpty()) m_attackSprites.push_back(fallback(128,128,QColor(70,130,180)));
+    if (m_idleSprites.isEmpty())   m_idleSprites.push_back(fallback(128,128,QColor(70,130,180)));
+    if (m_enemyWalk.isEmpty())     m_enemyWalk.push_back(fallback(128,128,QColor(180,60,60)));
+    if (m_enemyAttack.isEmpty())   m_enemyAttack.push_back(fallback(128,128,QColor(180,60,60)));
+    if (m_enemyIdle.isEmpty())     m_enemyIdle.push_back(fallback(128,128,QColor(180,60,60)));
+    if (m_enemyJump.isEmpty())     m_enemyJump.push_back(fallback(128,128,QColor(180,60,60)));
 
     m_tiempoAnimacion += dt;
     m_enemyTimer      += dt;
@@ -163,6 +176,8 @@ void GameWidget::gameLoop() {
         m_enemyTimer = 0.0f;
         if (m_enemyAtacando)
             m_enemyFrameActual = (m_enemyFrameActual + 1) % m_enemyAttack.size();
+        else if (!enemigo->estaEnSuelo())
+            m_enemyFrameActual = (m_enemyFrameActual + 1) % m_enemyJump.size();
         else if (enemigo->estaMoviendose())
             m_enemyFrameActual = (m_enemyFrameActual + 1) % m_enemyWalk.size();
         else
@@ -177,11 +192,26 @@ void GameWidget::gameLoop() {
 void GameWidget::paintEvent(QPaintEvent*) {
     QPainter p(this);
 
+    if (m_enTransicion) {
+        int idx = qBound(0, m_rondaActual - 1, (int)m_imgRondas.size() - 1);
+        if (!m_imgRondas[idx].isNull()) {
+            p.drawPixmap(rect(), m_imgRondas[idx]);
+        } else {
+            p.fillRect(rect(), QColor(20, 20, 20));
+            p.setFont(QFont("Arial", 40, QFont::Bold));
+            p.setPen(QColor(255, 220, 80));
+            p.drawText(rect(), Qt::AlignCenter,
+                       QString("Ronda %1").arg(m_rondaActual));
+        }
+        return;
+    }
+
     if (!m_fondo.isNull())
         p.drawPixmap(rect(), m_fondo);
     else
         p.fillRect(rect(), QColor(30, 30, 30));
 
+    // Plataforma
     p.setBrush(QColor(90, 70, 40));
     p.setPen(QPen(QColor(120, 90, 50), 2));
     p.drawRect(50, 520, 700, 20);
@@ -190,7 +220,7 @@ void GameWidget::paintEvent(QPaintEvent*) {
     Enemigo*   enemigo = m_nivel->getEnemigo();
     if (!jugador || !enemigo) return;
 
-    // ── Sprite jugador ────────────────────────────────────────────────────────
+    // Sprite jugador
     QPixmap spriteJugador;
     if (jugador->estaEmbistiendo())
         spriteJugador = m_attackSprites.isEmpty() ? fallback(128,128,QColor(70,130,180))
@@ -212,11 +242,14 @@ void GameWidget::paintEvent(QPaintEvent*) {
                  static_cast<int>(jugador->getY()) - 128,
                  128, 128, spriteJugador);
 
-    // ── Sprite enemigo ────────────────────────────────────────────────────────
+    // Sprite enemigo
     QPixmap spriteEnemigo;
     if (m_enemyAtacando)
         spriteEnemigo = m_enemyAttack.isEmpty() ? fallback(128,128,QColor(180,60,60))
                                                 : m_enemyAttack[m_enemyFrameActual % m_enemyAttack.size()];
+    else if (!enemigo->estaEnSuelo())
+        spriteEnemigo = m_enemyJump.isEmpty() ? fallback(128,128,QColor(180,60,60))
+                                              : m_enemyJump[m_enemyFrameActual % m_enemyJump.size()];
     else if (enemigo->estaMoviendose())
         spriteEnemigo = m_enemyWalk.isEmpty() ? fallback(128,128,QColor(180,60,60))
                                               : m_enemyWalk[m_enemyFrameActual % m_enemyWalk.size()];
@@ -231,28 +264,25 @@ void GameWidget::paintEvent(QPaintEvent*) {
                  static_cast<int>(enemigo->getY()) - 128,
                  128, 128, spriteEnemigo);
 
+    // HUD
     dibujarHUD(p);
 
+    // Pantalla final
     if (m_nivel->nivelFinalizado()) {
         bool gano = m_nivel->jugadorGano();
-
-        // Mostrar imagen de victoria o derrota a pantalla completa
         QPixmap& imgFinal = gano ? m_imgVictoria : m_imgDerrota;
 
         if (!imgFinal.isNull()) {
             p.drawPixmap(rect(), imgFinal);
         } else {
-            // Fallback si no carga la imagen
             p.setBrush(QColor(0, 0, 0, 160));
             p.setPen(Qt::NoPen);
             p.drawRect(rect());
-
             p.setFont(QFont("Arial", 32, QFont::Bold));
             p.setPen(gano ? QColor(100, 220, 100) : QColor(220, 80, 80));
             p.drawText(rect(), Qt::AlignCenter, gano ? "¡VICTORIA!" : "DERROTA");
         }
 
-        // Marcador encima de la imagen
         p.setFont(QFont("Arial", 14, QFont::Bold));
         p.setPen(QColor(220, 200, 100));
         p.drawText(QRect(0, height()/2 + 50, width(), 30),

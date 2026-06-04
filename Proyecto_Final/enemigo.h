@@ -36,7 +36,6 @@ private:
     float m_tiempoEsperaActual;
     float m_tiempoTranscurrido;
 
-    // ── Probabilidades de reacción ────────────────────────────────────────────
     float m_probSaltar;     // probabilidad de saltar cuando el jugador ataca
     float m_probEsquivar;   // probabilidad de esquivar cuando el jugador ataca
 

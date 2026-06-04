@@ -41,7 +41,7 @@ void Enemigo::percibir() {
 
 void Enemigo::razonar() {
 
-    // ── Reacción inmediata al ataque del jugador ──────────────────────────────
+    // Reacción inmediata al ataque del jugador
     // Si el jugador acaba de atacar y el enemigo está en suelo y sin acción,
     // puede saltar o esquivar para evitarlo
     bool jugadorAtacando = (m_ultimaAccionJugador == Accion::ATACAR);
@@ -61,7 +61,7 @@ void Enemigo::razonar() {
         }
     }
 
-    // ── Prioridad: retroceder si el jugador está muy cerca ────────────────────
+    // Prioridad: retroceder si el jugador está muy cerca
     if (jugadorEstaCerca()) {
         float r = static_cast<float>(std::rand()) / RAND_MAX;
         if (r < m_perfil.probRetrocederSiCerca) {
@@ -109,7 +109,7 @@ void Enemigo::razonar() {
         }
         break;
 
-    // ── Saltar: esperar a aterrizar para volver al flujo normal ──────────────
+    // Saltar: esperar a aterrizar para volver al flujo normal
     case EstadoAgente::SALTAR:
         if (m_enSuelo) {
             m_estadoActual = EstadoAgente::ESPERAR;
@@ -117,7 +117,7 @@ void Enemigo::razonar() {
         }
         break;
 
-    // ── Esquivar: termina cuando deja de esquivar (velX ~ 0) ─────────────────
+    // Esquivar: termina cuando deja de esquivar (velX ~ 0)
     case EstadoAgente::ESQUIVAR:
         if (!m_esquivando) {
             m_estadoActual = EstadoAgente::ESPERAR;
@@ -158,15 +158,15 @@ void Enemigo::actuar(float dt) {
         mover(-dirAlJugador);
         break;
 
-    // ── Saltar: se ejecuta una sola vez al entrar al estado ──────────────────
+    // ── Saltar: se ejecuta una sola vez al entrar al estado
     case EstadoAgente::SALTAR:
-        if (!m_enSuelo) break;   // ya saltó, esperar a caer
+        if (!m_enSuelo) break;
         saltar();
         break;
 
-    // ── Esquivar: alejarse del jugador ────────────────────────────────────────
+    // ── Esquivar: alejarse del jugador
     case EstadoAgente::ESQUIVAR:
-        if (!m_esquivando)       // ejecutar una sola vez
+        if (!m_esquivando)
             esquivar(-dirAlJugador);
         break;
     }
