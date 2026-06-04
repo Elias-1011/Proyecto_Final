@@ -12,10 +12,10 @@ Nivel1::Nivel1(Dificultad* dificultad, short tiempoSegundos)
     activo(true),
     exito(false),
     atacando(false),
+    pendienteTerminar(false),
     ultimoImpactoX(0.0f),
     ultimoImpactoY(0.0f),
-    hayImpactoNuevo(false),
-    pendienteTerminar(false)
+    hayImpactoNuevo(false)
 {
     if (!dificultad)
         throw invalid_argument("La dificultad no puede ser nula.");
@@ -25,7 +25,8 @@ Nivel1::Nivel1(Dificultad* dificultad, short tiempoSegundos)
     jugador = new Jugador(450.0f, 350.0f);
     jugador->setLimites(900.0f, 700.0f);
 
-    temblor = new FisicaTemblor(
+    // Temblor unificado: mismos parametros que antes
+    temblor = new Temblor(
         dif->getAmplitudTemblor(),
         15.0f, 2.5f, 2.5f
         );
@@ -75,7 +76,6 @@ void Nivel1::registrarImpacto(short idxRoca) {
         pendienteTerminar = true;
 }
 
-
 void Nivel1::spawnRoca(float rx, float ry) {
     if (!activo) return;
     if ((short)rocas.size() >= dif->getMaxRocasSimultaneas()) return;
@@ -112,7 +112,7 @@ void Nivel1::verificarColisionRocaJugador() {
         if (dist <= r->getRadio() + RADIO_JUGADOR) {
             jugador->perderVida();
             r->desactivar();
-            if (!jugador->estaVivo()) terminar();
+            if (!jugador->estaVivo()) pendienteTerminar = true;
             break;
         }
     }

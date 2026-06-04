@@ -14,13 +14,18 @@ SOURCES += \
     logica/personaje.cpp \
     logica/jugador.cpp \
     logica/roca.cpp \
-    logica/fisicatemblor.cpp \
+    logica/temblor.cpp \
     logica/nivel1.cpp \
     gui/escenamine.cpp \
     gui/escenadificultad.cpp \
     gui/escenatransicion.cpp \
     gui/escenanivel1.cpp \
-    gui/escenanivel2.cpp
+    nivel2/combatiente.cpp \
+    nivel2/principal.cpp \
+    nivel2/enemigo.cpp \
+    nivel2/nivel2.cpp \
+    nivel2/gamewidget.cpp \
+    nivel2/soundmanager.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -28,7 +33,7 @@ HEADERS += \
     logica/personaje.h \
     logica/jugador.h \
     logica/roca.h \
-    logica/fisicatemblor.h \
+    logica/temblor.h \
     logica/dificultad.h \
     logica/dificultadfacil.h \
     logica/dificultaddificil.h \
@@ -37,12 +42,19 @@ HEADERS += \
     gui/escenadificultad.h \
     gui/escenatransicion.h \
     gui/escenanivel1.h \
-    gui/escenanivel2.h
+    nivel2/enums.h \
+    nivel2/perfilJugador.h \
+    nivel2/combatiente.h \
+    nivel2/principal.h \
+    nivel2/enemigo.h \
+    nivel2/nivel2.h \
+    nivel2/gamewidget.h \
+    nivel2/soundmanager.h
 
-FORMS += \
-    mainwindow.ui
+FORMS += mainwindow.ui
 
-INCLUDEPATH += logica gui
+# logica antes que nivel2 para que "temblor.h" resuelva a logica/temblor.h
+INCLUDEPATH += logica gui nivel2
 
 RESOURCES += recursos.qrc
 

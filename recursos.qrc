@@ -1,41 +1,80 @@
 <RCC>
-    <qresource prefix="/img">
-        <file>recursos/jugador_arriba_0.png</file>
-        <file>recursos/jugador_arriba_1.png</file>
-        <file>recursos/jugador_arriba_2.png</file>
-        <file>recursos/jugador_abajo_0.png</file>
-        <file>recursos/jugador_abajo_1.png</file>
-        <file>recursos/jugador_abajo_2.png</file>
-        <file>recursos/jugador_izq_0.png</file>
-        <file>recursos/jugador_izq_1.png</file>
-        <file>recursos/jugador_izq_2.png</file>
-        <file>recursos/jugador_der_0.png</file>
-        <file>recursos/jugador_der_1.png</file>
-        <file>recursos/jugador_der_2.png</file>
-        <file>recursos/jugador_ataque_arriba.png</file>
-        <file>recursos/jugador_ataque_abajo.png</file>
-        <file>recursos/jugador_ataque_izq.png</file>
-        <file>recursos/jugador_ataque_der.png</file>
-        <file>recursos/roca_0.png</file>
-        <file>recursos/roca_1.png</file>
-        <file>recursos/roca_2.png</file>
-        <file>recursos/roca_3.png</file>
-        <file>recursos/roca_4.png</file>
-        <file>recursos/impacto.png</file>
-        <file>recursos/fondo_menu.png</file>
-        <file>recursos/fondo_escenario.png</file>
-        <file>recursos/transicion_inicio.png</file>
-        <file>recursos/transicion_fin_victoria.png</file>
-        <file>recursos/transicion_fin_derrota.png</file>
+    <qresource prefix="/n1img">
+        <file alias="jugador_arriba_0.png">recursos/recursosNivel1/jugador_arriba_0.png</file>
+        <file alias="jugador_arriba_1.png">recursos/recursosNivel1/jugador_arriba_1.png</file>
+        <file alias="jugador_arriba_2.png">recursos/recursosNivel1/jugador_arriba_2.png</file>
+        <file alias="jugador_abajo_0.png">recursos/recursosNivel1/jugador_abajo_0.png</file>
+        <file alias="jugador_abajo_1.png">recursos/recursosNivel1/jugador_abajo_1.png</file>
+        <file alias="jugador_abajo_2.png">recursos/recursosNivel1/jugador_abajo_2.png</file>
+        <file alias="jugador_izq_0.png">recursos/recursosNivel1/jugador_izq_0.png</file>
+        <file alias="jugador_izq_1.png">recursos/recursosNivel1/jugador_izq_1.png</file>
+        <file alias="jugador_izq_2.png">recursos/recursosNivel1/jugador_izq_2.png</file>
+        <file alias="jugador_der_0.png">recursos/recursosNivel1/jugador_der_0.png</file>
+        <file alias="jugador_der_1.png">recursos/recursosNivel1/jugador_der_1.png</file>
+        <file alias="jugador_der_2.png">recursos/recursosNivel1/jugador_der_2.png</file>
+        <file alias="jugador_ataque_arriba.png">recursos/recursosNivel1/jugador_ataque_arriba.png</file>
+        <file alias="jugador_ataque_abajo.png">recursos/recursosNivel1/jugador_ataque_abajo.png</file>
+        <file alias="jugador_ataque_izq.png">recursos/recursosNivel1/jugador_ataque_izq.png</file>
+        <file alias="jugador_ataque_der.png">recursos/recursosNivel1/jugador_ataque_der.png</file>
+        <file alias="roca_0.png">recursos/recursosNivel1/roca_0.png</file>
+        <file alias="roca_1.png">recursos/recursosNivel1/roca_1.png</file>
+        <file alias="roca_2.png">recursos/recursosNivel1/roca_2.png</file>
+        <file alias="roca_3.png">recursos/recursosNivel1/roca_3.png</file>
+        <file alias="roca_4.png">recursos/recursosNivel1/roca_4.png</file>
+        <file alias="impacto.png">recursos/recursosNivel1/impacto.png</file>
+        <file alias="fondo_menu.png">recursos/recursosNivel1/fondo_menu.png</file>
+        <file alias="fondo_escenario.png">recursos/recursosNivel1/fondo_escenario.png</file>
+        <file alias="transicion_inicio.png">recursos/recursosNivel1/transicion_inicio.png</file>
+        <file alias="transicion_fin_victoria.png">recursos/recursosNivel1/transicion_fin_victoria.png</file>
+        <file alias="transicion_fin_derrota.png">recursos/recursosNivel1/transicion_fin_derrota.png</file>
     </qresource>
-    <qresource prefix="/snd">
-        <file>recursos/sonido_menu.mp3</file>
-        <file>recursos/sonido_nivel1.mp3</file>
-        <file>recursos/sonido_temblor.mp3</file>
-        <file>recursos/sonido_ataque.mp3</file>
-        <file>recursos/sonido_impacto.mp3</file>
-        <file>recursos/sonido_victoria.mp3</file>
-        <file>recursos/sonido_derrota.mp3</file>
-        <file>recursos/sonido_danio.mp3</file>
+
+    <qresource prefix="/n1snd">
+        <file alias="sonido_menu.mp3">recursos/recursosNivel1/sonido_menu.mp3</file>
+        <file alias="sonido_nivel1.mp3">recursos/recursosNivel1/sonido_nivel1.mp3</file>
+        <file alias="sonido_temblor.mp3">recursos/recursosNivel1/sonido_temblor.mp3</file>
+        <file alias="sonido_ataque.mp3">recursos/recursosNivel1/sonido_ataque.mp3</file>
+        <file alias="sonido_impacto.mp3">recursos/recursosNivel1/sonido_impacto.mp3</file>
+        <file alias="sonido_victoria.mp3">recursos/recursosNivel1/sonido_victoria.mp3</file>
+        <file alias="sonido_derrota.mp3">recursos/recursosNivel1/sonido_derrota.mp3</file>
+        <file alias="sonido_danio.mp3">recursos/recursosNivel1/sonido_danio.mp3</file>
+    </qresource>
+
+    <qresource prefix="/n2img">
+        <file alias="Sprites/Fondo/fondo.png">recursos/recursosNivel2/Sprites/Fondo/fondo.png</file>
+        <file alias="Sprites/Fondo/victoria.png">recursos/recursosNivel2/Sprites/Fondo/victoria.png</file>
+        <file alias="Sprites/Fondo/derrota.png">recursos/recursosNivel2/Sprites/Fondo/derrota.png</file>
+        <file alias="Sprites/Fondo/ronda1.png">recursos/recursosNivel2/Sprites/Fondo/ronda1.png</file>
+        <file alias="Sprites/Fondo/ronda2.png">recursos/recursosNivel2/Sprites/Fondo/ronda2.png</file>
+        <file alias="Sprites/Fondo/ronda3.png">recursos/recursosNivel2/Sprites/Fondo/ronda3.png</file>
+        <file alias="Sprites/Fondo/ronda4.png">recursos/recursosNivel2/Sprites/Fondo/ronda4.png</file>
+        <file alias="Sprites/Fondo/ronda5.png">recursos/recursosNivel2/Sprites/Fondo/ronda5.png</file>
+        <file alias="Sprites/Jugador/walk1.png">recursos/recursosNivel2/Sprites/Jugador/walk1.png</file>
+        <file alias="Sprites/Jugador/walk2.png">recursos/recursosNivel2/Sprites/Jugador/walk2.png</file>
+        <file alias="Sprites/Jugador/walk3.png">recursos/recursosNivel2/Sprites/Jugador/walk3.png</file>
+        <file alias="Sprites/Jugador/walk4.png">recursos/recursosNivel2/Sprites/Jugador/walk4.png</file>
+        <file alias="Sprites/Jugador/walk5.png">recursos/recursosNivel2/Sprites/Jugador/walk5.png</file>
+        <file alias="Sprites/Jugador/walk6.png">recursos/recursosNivel2/Sprites/Jugador/walk6.png</file>
+        <file alias="Sprites/Jugador/jump1.png">recursos/recursosNivel2/Sprites/Jugador/jump1.png</file>
+        <file alias="Sprites/Jugador/ataque1.png">recursos/recursosNivel2/Sprites/Jugador/ataque1.png</file>
+        <file alias="Sprites/Enemigo/Walk1.png">recursos/recursosNivel2/Sprites/Enemigo/Walk1.png</file>
+        <file alias="Sprites/Enemigo/Walk2.png">recursos/recursosNivel2/Sprites/Enemigo/Walk2.png</file>
+        <file alias="Sprites/Enemigo/Walk3.png">recursos/recursosNivel2/Sprites/Enemigo/Walk3.png</file>
+        <file alias="Sprites/Enemigo/Walk4.png">recursos/recursosNivel2/Sprites/Enemigo/Walk4.png</file>
+        <file alias="Sprites/Enemigo/Walk5.png">recursos/recursosNivel2/Sprites/Enemigo/Walk5.png</file>
+        <file alias="Sprites/Enemigo/Walk6.png">recursos/recursosNivel2/Sprites/Enemigo/Walk6.png</file>
+        <file alias="Sprites/Enemigo/Ataque.png">recursos/recursosNivel2/Sprites/Enemigo/Ataque.png</file>
+        <file alias="Sprites/Enemigo/Saltar.png">recursos/recursosNivel2/Sprites/Enemigo/Saltar.png</file>
+    </qresource>
+
+    <qresource prefix="/n2snd">
+        <file alias="Sounds/golpe.mp3">recursos/recursosNivel2/Sounds/golpe.mp3</file>
+        <file alias="Sounds/embestida.mp3">recursos/recursosNivel2/Sounds/embestida.mp3</file>
+        <file alias="Sounds/salto.mp3">recursos/recursosNivel2/Sounds/salto.mp3</file>
+        <file alias="Sounds/esquive.mp3">recursos/recursosNivel2/Sounds/esquive.mp3</file>
+        <file alias="Sounds/punto.mp3">recursos/recursosNivel2/Sounds/punto.mp3</file>
+        <file alias="Sounds/victoria.mp3">recursos/recursosNivel2/Sounds/victoria.mp3</file>
+        <file alias="Sounds/derrota.mp3">recursos/recursosNivel2/Sounds/derrota.mp3</file>
+        <file alias="Sounds/musica_fondo.mp3">recursos/recursosNivel2/Sounds/musica_fondo.mp3</file>
     </qresource>
 </RCC>

@@ -1,7 +1,6 @@
 #include "escenamine.h"
 #include "mainwindow.h"
 #include "escenadificultad.h"
-#include "escenanivel2.h"
 #include <QGraphicsProxyWidget>
 #include <QApplication>
 
@@ -11,7 +10,7 @@ EscenaMenu::EscenaMenu(MainWindow* ventana)
     : QGraphicsScene(0, 0, MainWindow::ANCHO, MainWindow::ALTO),
     ventana(ventana)
 {
-    QPixmap pixFondo(":/img/recursos/fondo_menu.png");
+    QPixmap pixFondo(":/n1img/fondo_menu.png");
     fondo = addPixmap(pixFondo.scaled(MainWindow::ANCHO, MainWindow::ALTO,
                                       Qt::IgnoreAspectRatio,
                                       Qt::SmoothTransformation));
@@ -32,7 +31,7 @@ EscenaMenu::EscenaMenu(MainWindow* ventana)
     musicaMenu = new QMediaPlayer(this);
     audioMenu  = new QAudioOutput(this);
     musicaMenu->setAudioOutput(audioMenu);
-    musicaMenu->setSource(QUrl("qrc:/snd/recursos/sonido_menu.mp3"));
+    musicaMenu->setSource(QUrl("qrc:/n1snd/sonido_menu.mp3"));
     audioMenu->setVolume(0.6f);
     musicaMenu->setLoops(QMediaPlayer::Infinite);
     musicaMenu->play();
@@ -70,7 +69,7 @@ void EscenaMenu::irNivel1() {
 }
 
 void EscenaMenu::irNivel2() {
-    ventana->cambiarEscena(new EscenaNivel2(ventana));
+    ventana->irNivel2();
 }
 
 void EscenaMenu::salir() {

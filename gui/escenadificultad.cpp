@@ -14,7 +14,7 @@ EscenaDificultad::EscenaDificultad(MainWindow* ventana)
     ventana(ventana)
 {
     QGraphicsPixmapItem* fondo = addPixmap(
-        QPixmap(":/img/recursos/fondo_menu.png").scaled(
+        QPixmap(":/n1img/fondo_menu.png").scaled(
             MainWindow::ANCHO, MainWindow::ALTO,
             Qt::IgnoreAspectRatio, Qt::SmoothTransformation)
         );
@@ -34,18 +34,14 @@ EscenaDificultad::EscenaDificultad(MainWindow* ventana)
     configurarBoton(btnDificil, 350, 380);
     configurarBoton(btnVolver,  350, 480);
 
-    connect(btnFacil,   &QPushButton::clicked,
-            this, &EscenaDificultad::elegirFacil);
-    connect(btnDificil, &QPushButton::clicked,
-            this, &EscenaDificultad::elegirDificil);
-    connect(btnVolver,  &QPushButton::clicked,
-            this, &EscenaDificultad::volver);
+    connect(btnFacil,   &QPushButton::clicked, this, &EscenaDificultad::elegirFacil);
+    connect(btnDificil, &QPushButton::clicked, this, &EscenaDificultad::elegirDificil);
+    connect(btnVolver,  &QPushButton::clicked, this, &EscenaDificultad::volver);
 
     musicaDificultad = new QMediaPlayer(this);
     audioDificultad  = new QAudioOutput(this);
     musicaDificultad->setAudioOutput(audioDificultad);
-    musicaDificultad->setSource(
-        QUrl("qrc:/snd/recursos/sonido_menu.mp3"));
+    musicaDificultad->setSource(QUrl("qrc:/n1snd/sonido_menu.mp3"));
     audioDificultad->setVolume(0.6f);
     musicaDificultad->setLoops(QMediaPlayer::Infinite);
     musicaDificultad->play();
@@ -76,14 +72,6 @@ void EscenaDificultad::configurarBoton(QPushButton* btn, int x, int y) {
     proxy->setZValue(2);
 }
 
-void EscenaDificultad::elegirFacil() {
-    ventana->cambiarEscena(new EscenaTransicion(ventana, false));
-}
-
-void EscenaDificultad::elegirDificil() {
-    ventana->cambiarEscena(new EscenaTransicion(ventana, true));
-}
-
-void EscenaDificultad::volver() {
-    ventana->cambiarEscena(new EscenaMenu(ventana));
-}
+void EscenaDificultad::elegirFacil()   { ventana->cambiarEscena(new EscenaTransicion(ventana, false)); }
+void EscenaDificultad::elegirDificil() { ventana->cambiarEscena(new EscenaTransicion(ventana, true));  }
+void EscenaDificultad::volver()        { ventana->cambiarEscena(new EscenaMenu(ventana));              }

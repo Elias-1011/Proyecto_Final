@@ -30,10 +30,10 @@ EscenaNivel1::EscenaNivel1(MainWindow* ventana, bool esDificil)
     cargarSprites();
 
     itemFondo = addPixmap(
-        QPixmap(":/img/recursos/fondo_escenario.png").scaled(
+        QPixmap(":/n1img/fondo_escenario.png").scaled(
             MainWindow::ANCHO, MainWindow::ALTO,
             Qt::IgnoreAspectRatio, Qt::SmoothTransformation)
-    );
+        );
     itemFondo->setZValue(0);
 
     itemJugador = addPixmap(sprJugadorAbajo[0]);
@@ -91,7 +91,7 @@ EscenaNivel1::EscenaNivel1(MainWindow* ventana, bool esDificil)
     musicaNivel = new QMediaPlayer(this);
     audioNivel  = new QAudioOutput(this);
     musicaNivel->setAudioOutput(audioNivel);
-    musicaNivel->setSource(QUrl("qrc:/snd/recursos/sonido_nivel1.mp3"));
+    musicaNivel->setSource(QUrl("qrc:/n1snd/sonido_nivel1.mp3"));
     audioNivel->setVolume(0.5f);
     musicaNivel->setLoops(QMediaPlayer::Infinite);
     musicaNivel->play();
@@ -99,25 +99,25 @@ EscenaNivel1::EscenaNivel1(MainWindow* ventana, bool esDificil)
     sonidoTemblor = new QMediaPlayer(this);
     audioTemblor  = new QAudioOutput(this);
     sonidoTemblor->setAudioOutput(audioTemblor);
-    sonidoTemblor->setSource(QUrl("qrc:/snd/recursos/sonido_temblor.mp3"));
+    sonidoTemblor->setSource(QUrl("qrc:/n1snd/sonido_temblor.mp3"));
     audioTemblor->setVolume(0.7f);
 
     sonidoAtaque = new QMediaPlayer(this);
     audioAtaque  = new QAudioOutput(this);
     sonidoAtaque->setAudioOutput(audioAtaque);
-    sonidoAtaque->setSource(QUrl("qrc:/snd/recursos/sonido_ataque.mp3"));
+    sonidoAtaque->setSource(QUrl("qrc:/n1snd/sonido_ataque.mp3"));
     audioAtaque->setVolume(0.8f);
 
     sonidoImpacto = new QMediaPlayer(this);
     audioImpacto  = new QAudioOutput(this);
     sonidoImpacto->setAudioOutput(audioImpacto);
-    sonidoImpacto->setSource(QUrl("qrc:/snd/recursos/sonido_impacto.mp3"));
+    sonidoImpacto->setSource(QUrl("qrc:/n1snd/sonido_impacto.mp3"));
     audioImpacto->setVolume(0.8f);
 
     sonidoDanio = new QMediaPlayer(this);
     audioDanio  = new QAudioOutput(this);
     sonidoDanio->setAudioOutput(audioDanio);
-    sonidoDanio->setSource(QUrl("qrc:/snd/recursos/sonido_danio.mp3"));
+    sonidoDanio->setSource(QUrl("qrc:/n1snd/sonido_danio.mp3"));
     audioDanio->setVolume(0.8f);
 
     temblorSonando = false;
@@ -132,47 +132,47 @@ EscenaNivel1::~EscenaNivel1() {
 void EscenaNivel1::cargarSprites() {
     for (short i = 0; i < 3; i++) {
         sprJugadorArriba[i] = QPixmap(
-            QString(":/img/recursos/jugador_arriba_%1.png").arg(i))
-            .scaled(TAM_JUGADOR, TAM_JUGADOR,
-                    Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                                  QString(":/n1img/jugador_arriba_%1.png").arg(i))
+                                  .scaled(TAM_JUGADOR, TAM_JUGADOR,
+                                          Qt::KeepAspectRatio, Qt::SmoothTransformation);
         sprJugadorAbajo[i] = QPixmap(
-            QString(":/img/recursos/jugador_abajo_%1.png").arg(i))
-            .scaled(TAM_JUGADOR, TAM_JUGADOR,
-                    Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                                 QString(":/n1img/jugador_abajo_%1.png").arg(i))
+                                 .scaled(TAM_JUGADOR, TAM_JUGADOR,
+                                         Qt::KeepAspectRatio, Qt::SmoothTransformation);
         sprJugadorIzq[i] = QPixmap(
-            QString(":/img/recursos/jugador_izq_%1.png").arg(i))
-            .scaled(TAM_JUGADOR, TAM_JUGADOR,
-                    Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                               QString(":/n1img/jugador_izq_%1.png").arg(i))
+                               .scaled(TAM_JUGADOR, TAM_JUGADOR,
+                                       Qt::KeepAspectRatio, Qt::SmoothTransformation);
         sprJugadorDer[i] = QPixmap(
-            QString(":/img/recursos/jugador_der_%1.png").arg(i))
-            .scaled(TAM_JUGADOR, TAM_JUGADOR,
-                    Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                               QString(":/n1img/jugador_der_%1.png").arg(i))
+                               .scaled(TAM_JUGADOR, TAM_JUGADOR,
+                                       Qt::KeepAspectRatio, Qt::SmoothTransformation);
     }
 
-    sprAtaque[0] = QPixmap(":/img/recursos/jugador_ataque_arriba.png")
-                   .scaled(TAM_ATAQUE, TAM_ATAQUE,
-                           Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    sprAtaque[1] = QPixmap(":/img/recursos/jugador_ataque_abajo.png")
-                   .scaled(TAM_ATAQUE, TAM_ATAQUE,
-                           Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    sprAtaque[2] = QPixmap(":/img/recursos/jugador_ataque_izq.png")
-                   .scaled(TAM_ATAQUE, TAM_ATAQUE,
-                           Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    sprAtaque[3] = QPixmap(":/img/recursos/jugador_ataque_der.png")
-                   .scaled(TAM_ATAQUE, TAM_ATAQUE,
-                           Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    sprAtaque[0] = QPixmap(":/n1img/jugador_ataque_arriba.png")
+                       .scaled(TAM_ATAQUE, TAM_ATAQUE,
+                               Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    sprAtaque[1] = QPixmap(":/n1img/jugador_ataque_abajo.png")
+                       .scaled(TAM_ATAQUE, TAM_ATAQUE,
+                               Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    sprAtaque[2] = QPixmap(":/n1img/jugador_ataque_izq.png")
+                       .scaled(TAM_ATAQUE, TAM_ATAQUE,
+                               Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    sprAtaque[3] = QPixmap(":/n1img/jugador_ataque_der.png")
+                       .scaled(TAM_ATAQUE, TAM_ATAQUE,
+                               Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
-    sprImpacto = QPixmap(":/img/recursos/impacto.png")
-                 .scaled(TAM_ROCA_MAX, TAM_ROCA_MAX,
-                         Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    sprImpacto = QPixmap(":/n1img/impacto.png")
+                     .scaled(TAM_ROCA_MAX, TAM_ROCA_MAX,
+                             Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
     for (short i = 0; i < 5; i++) {
         short tam = TAM_ROCA_BASE +
                     (TAM_ROCA_MAX - TAM_ROCA_BASE) * i / 4;
         sprRocas[i] = QPixmap(
-            QString(":/img/recursos/roca_%1.png").arg(i))
-            .scaled(tam, tam,
-                    Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                          QString(":/n1img/roca_%1.png").arg(i))
+                          .scaled(tam, tam,
+                                  Qt::KeepAspectRatio, Qt::SmoothTransformation);
     }
 }
 

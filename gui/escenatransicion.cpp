@@ -13,7 +13,7 @@ EscenaTransicion::EscenaTransicion(MainWindow* ventana, bool esDificil)
     dificil(esDificil)
 {
     timer = new QTimer(this);
-    construir(":/img/recursos/transicion_inicio.png", "");
+    construir(":/n1img/transicion_inicio.png", "");
 }
 
 EscenaTransicion::EscenaTransicion(MainWindow* ventana, bool victoria, bool)
@@ -23,12 +23,10 @@ EscenaTransicion::EscenaTransicion(MainWindow* ventana, bool victoria, bool)
     dificil(false)
 {
     timer = new QTimer(this);
-    QString rutaImg = victoria
-                          ? ":/img/recursos/transicion_fin_victoria.png"
-                          : ":/img/recursos/transicion_fin_derrota.png";
-    QString rutaSnd = victoria
-                          ? "qrc:/snd/recursos/sonido_victoria.mp3"
-                          : "qrc:/snd/recursos/sonido_derrota.mp3";
+    QString rutaImg = victoria ? ":/n1img/transicion_fin_victoria.png"
+                               : ":/n1img/transicion_fin_derrota.png";
+    QString rutaSnd = victoria ? "qrc:/n1snd/sonido_victoria.mp3"
+                               : "qrc:/n1snd/sonido_derrota.mp3";
     construir(rutaImg, rutaSnd);
 }
 
@@ -55,8 +53,7 @@ void EscenaTransicion::construir(const QString& rutaImagen,
         sonido->play();
     }
 
-    connect(timer, &QTimer::timeout,
-            this, &EscenaTransicion::avanzar);
+    connect(timer, &QTimer::timeout, this, &EscenaTransicion::avanzar);
     timer->setSingleShot(true);
     timer->start(2000);
 }

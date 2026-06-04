@@ -1,10 +1,10 @@
-#include "fisicatemblor.h"
+#include "temblor.h"
 #include <cmath>
 #include <stdexcept>
 
 using namespace std;
 
-FisicaTemblor::FisicaTemblor(float A, float omega, float lambda, float duracion)
+Temblor::Temblor(float A, float omega, float lambda, float duracion)
     : A(A), omega(omega), lambda(lambda), duracion(duracion),
     t(0.0f), activo(false)
 {
@@ -14,23 +14,23 @@ FisicaTemblor::FisicaTemblor(float A, float omega, float lambda, float duracion)
         throw invalid_argument("omega y lambda deben ser positivos.");
 }
 
-void FisicaTemblor::iniciar() {
+void Temblor::iniciar() {
     t      = 0.0f;
     activo = true;
 }
 
-void FisicaTemblor::actualizar(float dt) {
+void Temblor::actualizar(float dt) {
     if (!activo) return;
     t += dt;
     if (t >= duracion) activo = false;
 }
 
-float FisicaTemblor::getOffsetX() const {
+float Temblor::getOffsetX() const {
     if (!activo) return 0.0f;
     return A * sin(omega * t) * exp(-lambda * t);
 }
 
-float FisicaTemblor::getOffsetY() const {
+float Temblor::getOffsetY() const {
     if (!activo) return 0.0f;
     return (A * 0.6f) * sin(omega * t + 1.047f) * exp(-lambda * t);
 }
