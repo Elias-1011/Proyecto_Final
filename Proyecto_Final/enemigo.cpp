@@ -5,22 +5,22 @@
 #include <cmath>
 
 Enemigo::Enemigo(float x, float y, Nivel_2* referenciaEstado)
-    : Personaje(x, y)
-    , m_referenciaEstado(referenciaEstado)
-    , m_estadoActual(EstadoAgente::ESPERAR)
-    , m_distanciaAlJugador(0.0f)
-    , m_ultimaAccionJugador(Accion::MOVER)
-    , m_temblor_activo(false)
-    , m_marcadorAgente(0)
-    , m_marcadorJugador(0)
-    , m_distanciaObjetivo(160.0f)
-    , m_distanciaMinima(80.0f)
-    , m_tiempoEsperaMin(0.5f)
-    , m_tiempoEsperaMax(1.5f)
-    , m_tiempoEsperaActual(0.8f)
-    , m_tiempoTranscurrido(0.0f)
-    , m_probSaltar(0.3f)
-    , m_probEsquivar(0.4f)
+    : Personaje(x, y),
+    m_referenciaEstado(referenciaEstado),
+    m_estadoActual(EstadoAgente::ESPERAR),
+    m_distanciaAlJugador(0.0f),
+    m_ultimaAccionJugador(Accion::MOVER),
+    m_temblor_activo(false),
+    m_marcadorAgente(0),
+    m_marcadorJugador(0),
+    m_distanciaObjetivo(160.0f),
+    m_distanciaMinima(80.0f),
+    m_tiempoEsperaMin(0.5f),
+    m_tiempoEsperaMax(1.5f),
+    m_tiempoEsperaActual(0.8f),
+    m_tiempoTranscurrido(0.0f),
+    m_probSaltar(0.3f),
+    m_probEsquivar(0.4f)
 {}
 
 void Enemigo::actualizar(float dt) {
@@ -40,10 +40,6 @@ void Enemigo::percibir() {
 }
 
 void Enemigo::razonar() {
-
-    // Reacción inmediata al ataque del jugador
-    // Si el jugador acaba de atacar y el enemigo está en suelo y sin acción,
-    // puede saltar o esquivar para evitarlo
     bool jugadorAtacando = (m_ultimaAccionJugador == Accion::ATACAR);
     bool puedeReaccionar = m_enSuelo && !m_embistiendo && !m_recuperando &&
                            m_estadoActual != EstadoAgente::ESQUIVAR &&
@@ -51,7 +47,6 @@ void Enemigo::razonar() {
 
     if (jugadorAtacando && puedeReaccionar) {
         float r = static_cast<float>(std::rand()) / RAND_MAX;
-
         if (r < m_probEsquivar) {
             m_estadoActual = EstadoAgente::ESQUIVAR;
             return;
@@ -61,7 +56,6 @@ void Enemigo::razonar() {
         }
     }
 
-    // Prioridad: retroceder si el jugador está muy cerca
     if (jugadorEstaCerca()) {
         float r = static_cast<float>(std::rand()) / RAND_MAX;
         if (r < m_perfil.probRetrocederSiCerca) {
@@ -109,7 +103,6 @@ void Enemigo::razonar() {
         }
         break;
 
-    // Saltar: esperar a aterrizar para volver al flujo normal
     case EstadoAgente::SALTAR:
         if (m_enSuelo) {
             m_estadoActual = EstadoAgente::ESPERAR;
@@ -117,7 +110,6 @@ void Enemigo::razonar() {
         }
         break;
 
-    // Esquivar: termina cuando deja de esquivar (velX ~ 0)
     case EstadoAgente::ESQUIVAR:
         if (!m_esquivando) {
             m_estadoActual = EstadoAgente::ESPERAR;
@@ -139,18 +131,16 @@ void Enemigo::actuar(float dt) {
     case EstadoAgente::AVANZAR: {
         float dirAvance = dirAlJugador;
         float r = static_cast<float>(std::rand()) / RAND_MAX;
-        if (r < m_perfil.probAvanzarDirOpuesta) {
+        if (r < m_perfil.probAvanzarDirOpuesta)
             dirAvance = dirAlJugador;
-        }
         mover(dirAvance);
         break;
     }
 
     case EstadoAgente::ATACAR:
         if (puedeAtacar()) {
-            if (m_distanciaAlJugador <= m_distanciaObjetivo + 20.0f) {
+            if (m_distanciaAlJugador <= m_distanciaObjetivo + 20.0f)
                 atacar(dirAlJugador);
-            }
         }
         break;
 
@@ -158,13 +148,11 @@ void Enemigo::actuar(float dt) {
         mover(-dirAlJugador);
         break;
 
-    // ── Saltar: se ejecuta una sola vez al entrar al estado
     case EstadoAgente::SALTAR:
         if (!m_enSuelo) break;
         saltar();
         break;
 
-    // ── Esquivar: alejarse del jugador
     case EstadoAgente::ESQUIVAR:
         if (!m_esquivando)
             esquivar(-dirAlJugador);
@@ -176,20 +164,20 @@ void Enemigo::aprender() {
     m_perfil.totalPuntos++;
 
     Principal* jugador = m_referenciaEstado->getJugador();
+    bool jugadorGanoEstaRonda = (m_referenciaEstado->getPuntosJugador() >
+                                 m_referenciaEstado->getPuntosAgente());
 
     for (Accion a : m_historial) {
         if (a == Accion::ATACAR) {
-            if (m_distanciaAlJugador < m_distanciaMinima * 1.5f) {
+            if (m_distanciaAlJugador < m_distanciaMinima * 1.5f)
                 m_perfil.ataquesCortoRango++;
-            } else {
+            else
                 m_perfil.ataquesMedioRango++;
-            }
         } else if (a == Accion::ESQUIVAR) {
-            if (jugador->getX() < m_x) {
+            if (jugador->getX() < m_x)
                 m_perfil.esquivesIzquierda++;
-            } else {
+            else
                 m_perfil.esquivesDerecha++;
-            }
         } else if (a == Accion::SALTAR) {
             m_perfil.saltos++;
         }
@@ -197,6 +185,43 @@ void Enemigo::aprender() {
 
     m_historial.clear();
     m_perfil.recalcularProbabilidades();
+
+    ajustarDificultad(jugadorGanoEstaRonda);
+}
+
+void Enemigo::ajustarDificultad(bool jugadorGanoRonda) {
+    if (jugadorGanoRonda) {
+
+        m_tiempoEsperaMin = clamp(m_tiempoEsperaMin - 0.08f,
+                                  ESPERA_MIN_TOPE, m_tiempoEsperaMax);
+        m_tiempoEsperaMax = clamp(m_tiempoEsperaMax - 0.15f,
+                                  m_tiempoEsperaMin, ESPERA_MAX_TOPE);
+
+        m_probEsquivar = clamp(m_probEsquivar + 0.07f, PROB_MIN_TOPE, PROB_MAX_TOPE);
+        m_probSaltar   = clamp(m_probSaltar   + 0.05f, PROB_MIN_TOPE, PROB_MAX_TOPE);
+
+        m_velEmbestida = clamp(m_velEmbestida + 30.0f,
+                               VEL_EMBESTIDA_MIN, VEL_EMBESTIDA_MAX);
+
+        m_distanciaObjetivo = clamp(m_distanciaObjetivo + 15.0f,
+                                    DIST_OBJ_MIN, DIST_OBJ_MAX);
+
+    } else {
+
+        m_tiempoEsperaMin = clamp(m_tiempoEsperaMin + 0.08f,
+                                  ESPERA_MIN_TOPE, ESPERA_MAX_TOPE);
+        m_tiempoEsperaMax = clamp(m_tiempoEsperaMax + 0.15f,
+                                  m_tiempoEsperaMin, ESPERA_MAX_TOPE);
+
+        m_probEsquivar = clamp(m_probEsquivar - 0.07f, PROB_MIN_TOPE, PROB_MAX_TOPE);
+        m_probSaltar   = clamp(m_probSaltar   - 0.05f, PROB_MIN_TOPE, PROB_MAX_TOPE);
+
+        m_velEmbestida = clamp(m_velEmbestida - 30.0f,
+                               VEL_EMBESTIDA_MIN, VEL_EMBESTIDA_MAX);
+
+        m_distanciaObjetivo = clamp(m_distanciaObjetivo - 15.0f,
+                                    DIST_OBJ_MIN, DIST_OBJ_MAX);
+    }
 }
 
 bool Enemigo::estaMoviendose() const {

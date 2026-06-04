@@ -1,7 +1,9 @@
 #ifndef PERSONAJE_H
 #define PERSONAJE_H
+
 #include "enums.h"
 #include <cmath>
+
 class Personaje {
 public:
     Personaje(float x, float y);

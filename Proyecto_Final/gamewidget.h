@@ -1,5 +1,6 @@
 #ifndef GAMEWIDGET_H
 #define GAMEWIDGET_H
+
 #include <QWidget>
 #include <QTimer>
 #include <QPainter>

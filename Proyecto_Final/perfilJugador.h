@@ -10,7 +10,6 @@ struct PerfilJugador {
     int saltos             = 0;
     int totalPuntos        = 0;
 
-
     float probRetrocederSiCerca   = 0.3f;
     float probAvanzarDirOpuesta   = 0.5f;
 
