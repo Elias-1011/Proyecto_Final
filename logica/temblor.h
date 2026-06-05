@@ -1,11 +1,6 @@
 #ifndef TEMBLOR_H
 #define TEMBLOR_H
 
-// Fisica del temblor sismico unificada para ambos niveles.
-// Ecuacion: offset(t) = A * sin(omega * t) * e^(-lambda * t)
-//
-// Nivel 1 usa getOffsetX() y getOffsetY() (con fase Y desplazada)
-// Nivel 2 usa getOffset() (equivalente a getOffsetX())
 
 class Temblor {
 public:

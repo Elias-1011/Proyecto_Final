@@ -1,7 +1,7 @@
 #ifndef ENEMIGO_H
 #define ENEMIGO_H
 
-#include "combatiente.h"   // antes: personaje.h
+#include "combatiente.h"
 #include "perfilJugador.h"
 #include "enums.h"
 #include <vector>

@@ -52,6 +52,8 @@ private:
     QPixmap sprRocas[5];
     QPixmap sprImpacto;
 
+    bool teclas[4];
+
     QGraphicsPixmapItem*        itemFondo;
     QGraphicsPixmapItem*        itemJugador;
     QList<QGraphicsPixmapItem*> itemsRocas;
@@ -109,7 +111,7 @@ private:
     short    getIdxDireccion()           const;
 
     static constexpr short TAM_JUGADOR     = 64;
-    static constexpr short TAM_ATAQUE      = 80;
+    static constexpr short TAM_ATAQUE      = 110;
     static constexpr short TAM_ROCA_BASE   = 20;
     static constexpr short TAM_ROCA_MAX    = 80;
     static constexpr short TICKS_POR_FRAME = 8;

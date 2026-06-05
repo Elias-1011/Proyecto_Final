@@ -5,7 +5,7 @@
 #include <cmath>
 
 Enemigo::Enemigo(float x, float y, Nivel_2* referenciaEstado)
-    : Combatiente(x, y),           // antes: Personaje(x, y)
+    : Combatiente(x, y),
     m_referenciaEstado(referenciaEstado),
     m_estadoActual(EstadoAgente::ESPERAR),
     m_distanciaAlJugador(0.0f),
@@ -27,7 +27,7 @@ void Enemigo::actualizar(float dt) {
     percibir();
     razonar();
     actuar(dt);
-    Combatiente::actualizar(dt);   // antes: Personaje::actualizar(dt)
+    Combatiente::actualizar(dt);
 }
 
 void Enemigo::percibir() {

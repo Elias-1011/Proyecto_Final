@@ -4,8 +4,7 @@
 #include "enums.h"
 #include <cmath>
 
-// Clase base de los personajes del Nivel 2.
-// Renombrada de Personaje para evitar conflicto con logica/personaje.h del Nivel 1.
+
 class Combatiente {
 public:
     Combatiente(float x, float y);

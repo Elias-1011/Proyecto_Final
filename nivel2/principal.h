@@ -1,7 +1,7 @@
 #ifndef PRINCIPAL_H
 #define PRINCIPAL_H
 
-#include "combatiente.h"   // antes: personaje.h
+#include "combatiente.h"
 
 struct InputManager {
     bool izquierda = false;

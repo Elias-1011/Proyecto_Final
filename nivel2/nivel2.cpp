@@ -32,9 +32,6 @@ void Nivel_2::iniciar() {
     m_jugador->input = &m_input;
     m_enemigo        = new Enemigo(650.0f, Y_SUELO, this);
 
-    // Temblor unificado: convertimos frecuencia 3.5Hz a omega rad/s
-    // Original: Temblor(amplitud=18, frecuencia=3.5Hz, duracion=2.0, amort=2.5)
-    // Equivalente: omega = 2*PI*3.5 ≈ 21.991 rad/s  →  misma fisica exacta
     m_temblor = new Temblor(18.0f, 21.991f, 2.5f, 2.0f);
 
     m_puntosPrincipal = 0;

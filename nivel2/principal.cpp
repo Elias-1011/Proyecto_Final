@@ -1,7 +1,7 @@
 #include "principal.h"
 
 Principal::Principal(float x, float y)
-    : Combatiente(x, y)   // antes: Personaje(x, y)
+    : Combatiente(x, y)
     , input(nullptr)
     , m_ultimaDireccion(1.0f)
 {}

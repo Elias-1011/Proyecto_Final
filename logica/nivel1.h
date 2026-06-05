@@ -4,7 +4,7 @@
 #include <vector>
 #include "jugador.h"
 #include "roca.h"
-#include "temblor.h"          // antes: fisicatemblor.h
+#include "temblor.h"
 #include "dificultad.h"
 
 using namespace std;
@@ -48,7 +48,7 @@ public:
 private:
     Jugador*      jugador;
     vector<Roca*> rocas;
-    Temblor*      temblor;    // antes: FisicaTemblor*
+    Temblor*      temblor;
     Dificultad*   dif;
 
     short tiempoRestante;

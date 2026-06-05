@@ -40,13 +40,13 @@ private:
     Enemigo* m_enemigo;
 
     Temblor* m_temblor;
-    float    m_tiempoHasteTemblor;   // segundos hasta el próximo temblor
-    float    m_intervaloTemblor;     // segundos entre temblores
+    float    m_tiempoHasteTemblor;
+    float    m_intervaloTemblor;
 
     int   m_puntosPrincipal;
     int   m_puntosEnemigo;
-    int   m_toquesPrincipal;   // toques del jugador sobre el enemigo en el punto actual
-    int   m_toquesEnemigo;     // toques del enemigo sobre el jugador en el punto actual
+    int   m_toquesPrincipal;
+    int   m_toquesEnemigo;
     int   m_puntosParaGanar;
 
     bool  m_finalizado;

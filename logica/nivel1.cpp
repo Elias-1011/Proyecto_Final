@@ -25,7 +25,6 @@ Nivel1::Nivel1(Dificultad* dificultad, short tiempoSegundos)
     jugador = new Jugador(450.0f, 350.0f);
     jugador->setLimites(900.0f, 700.0f);
 
-    // Temblor unificado: mismos parametros que antes
     temblor = new Temblor(
         dif->getAmplitudTemblor(),
         15.0f, 2.5f, 2.5f

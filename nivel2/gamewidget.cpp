@@ -24,9 +24,7 @@ GameWidget::GameWidget(QWidget* parent)
 {
     setFocusPolicy(Qt::StrongFocus);
     cargarSprites();
-    connect(&m_timer, &QTimer::timeout, this, &GameWidget::gameLoop);
-    // NO iniciamos musica ni timer aqui.
-    // reiniciar() lo hara cuando el usuario entre al Nivel 2.
+    connect(&m_timer, &QTimer::timeout, this, &GameWidget::gameLoop); 
 }
 
 GameWidget::~GameWidget() {
@@ -55,7 +53,6 @@ void GameWidget::reiniciar() {
     m_puntosJugadorAntes   = 0;     m_puntosEnemigoAntes   = 0;
     m_nivelFinalizadoAntes = false;
 
-    // Solo aqui arrancamos musica y game loop
     m_sonidos.playMusica();
     m_timer.start(16);
 }
@@ -211,8 +208,6 @@ void GameWidget::gameLoop() {
 void GameWidget::paintEvent(QPaintEvent*) {
     QPainter p(this);
 
-    // Y_OFF compensa la diferencia entre la ventana original (600px)
-    // y la actual (700px), manteniendo proporciones visuales correctas
     const int Y_OFF = height() - 600;
 
     if (m_enTransicion) {
@@ -231,7 +226,6 @@ void GameWidget::paintEvent(QPaintEvent*) {
     if (!m_fondo.isNull()) p.drawPixmap(rect(), m_fondo);
     else                   p.fillRect(rect(), QColor(30, 30, 30));
 
-    // Plataforma ajustada con Y_OFF
     p.setBrush(QColor(90, 70, 40));
     p.setPen(QPen(QColor(120, 90, 50), 2));
     p.drawRect(50, 520 + Y_OFF, width() - 100, 20);
@@ -240,7 +234,6 @@ void GameWidget::paintEvent(QPaintEvent*) {
     Enemigo*   enemigo = m_nivel->getEnemigo();
     if (!jugador || !enemigo) return;
 
-    // Sprite jugador
     QPixmap spriteJugador;
     if      (jugador->estaEmbistiendo()) spriteJugador = m_attackSprites[m_frameActual % m_attackSprites.size()];
     else if (!jugador->estaEnSuelo())    spriteJugador = m_jumpSprites[m_frameActual   % m_jumpSprites.size()];
@@ -249,13 +242,9 @@ void GameWidget::paintEvent(QPaintEvent*) {
 
     if (jugador->getDireccion() < 0)
         spriteJugador = spriteJugador.transformed(QTransform().scale(-1, 1));
-
-    // Dibuja con Y_OFF para bajar el sprite al lugar correcto
     p.drawPixmap((int)jugador->getX() - 64,
                  (int)jugador->getY() - 128 + Y_OFF,
                  128, 128, spriteJugador);
-
-    // Sprite enemigo
     QPixmap spriteEnemigo;
     if      (m_enemyAtacando)          spriteEnemigo = m_enemyAttack[m_enemyFrameActual % m_enemyAttack.size()];
     else if (!enemigo->estaEnSuelo())  spriteEnemigo = m_enemyJump[m_enemyFrameActual   % m_enemyJump.size()];
@@ -336,6 +325,11 @@ void GameWidget::keyPressEvent(QKeyEvent* event) {
     case Qt::Key_W:     input.saltar    = true;  m_nivel->registrarAccionJugador(Accion::SALTAR);   break;
     case Qt::Key_Shift: input.esquivar  = true;  m_nivel->registrarAccionJugador(Accion::ESQUIVAR); break;
     case Qt::Key_Space: input.atacar    = true;  m_nivel->registrarAccionJugador(Accion::ATACAR);   break;
+    case Qt::Key_P:
+        m_timer.stop();
+        m_sonidos.stopMusica();
+        QTimer::singleShot(0, this, [this]() { emit juegoTerminado(); });
+        break;
     default: break;
     }
 }

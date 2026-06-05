@@ -1,6 +1,7 @@
 #include "escenanivel1.h"
 #include "mainwindow.h"
 #include "escenatransicion.h"
+#include "escenamine.h"
 #include <QDateTime>
 #include <QRandomGenerator>
 #include <QFont>
@@ -14,6 +15,7 @@ EscenaNivel1::EscenaNivel1(MainWindow* ventana, bool esDificil)
     ventana(ventana),
     dirActual(Direccion::Abajo),
     frameActual(0),
+    teclas{false, false, false, false},
     ticksAnimacion(0),
     ticksAtaqueVisible(0),
     puedeAtacar(true),
@@ -180,22 +182,10 @@ void EscenaNivel1::keyPressEvent(QKeyEvent* e) {
     if (e->isAutoRepeat()) return;
 
     switch (e->key()) {
-    case Qt::Key_W:
-        nivel->moverJugador(true, false, false, false);
-        dirActual = Direccion::Arriba;
-        break;
-    case Qt::Key_S:
-        nivel->moverJugador(false, true, false, false);
-        dirActual = Direccion::Abajo;
-        break;
-    case Qt::Key_A:
-        nivel->moverJugador(false, false, true, false);
-        dirActual = Direccion::Izquierda;
-        break;
-    case Qt::Key_D:
-        nivel->moverJugador(false, false, false, true);
-        dirActual = Direccion::Derecha;
-        break;
+    case Qt::Key_W: teclas[0] = true;  dirActual = Direccion::Arriba;    break;
+    case Qt::Key_S: teclas[1] = true;  dirActual = Direccion::Abajo;     break;
+    case Qt::Key_A: teclas[2] = true;  dirActual = Direccion::Izquierda; break;
+    case Qt::Key_D: teclas[3] = true;  dirActual = Direccion::Derecha;   break;
     case Qt::Key_Space:
         if (puedeAtacar && ticksAtaqueVisible == 0) {
             puedeAtacar = false;
@@ -206,23 +196,38 @@ void EscenaNivel1::keyPressEvent(QKeyEvent* e) {
             verificarColisionAtaqueRoca();
         }
         break;
-    default:
+    case Qt::Key_P:
+        timerLoop->stop();
+        timerSpawn->stop();
+        timerTemblor->stop();
+        timerSegundo->stop();
+        timerCooldownAtaque->stop();
+        musicaNivel->stop();
+        {
+            MainWindow* vent = ventana;
+            QTimer::singleShot(0, vent, [vent]() {
+                vent->cambiarEscena(new EscenaMenu(vent));
+            });
+        }
         break;
+    default: break;
     }
+
+    nivel->moverJugador(teclas[0], teclas[1], teclas[2], teclas[3]);
 }
 
 void EscenaNivel1::keyReleaseEvent(QKeyEvent* e) {
     if (e->isAutoRepeat()) return;
+
     switch (e->key()) {
-    case Qt::Key_W:
-    case Qt::Key_S:
-    case Qt::Key_A:
-    case Qt::Key_D:
-        nivel->moverJugador(false, false, false, false);
-        break;
-    default:
-        break;
+    case Qt::Key_W: teclas[0] = false; break;
+    case Qt::Key_S: teclas[1] = false; break;
+    case Qt::Key_A: teclas[2] = false; break;
+    case Qt::Key_D: teclas[3] = false; break;
+    default: break;
     }
+
+    nivel->moverJugador(teclas[0], teclas[1], teclas[2], teclas[3]);
 }
 
 void EscenaNivel1::actualizarFrame() {
