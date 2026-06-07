@@ -17,10 +17,10 @@ MainWindow::MainWindow(QWidget* parent)
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setFrameStyle(0);
-    stack->addWidget(view);       // indice 0: menus y Nivel 1
+    stack->addWidget(view);
 
     gameWidget = new GameWidget(this);
-    stack->addWidget(gameWidget); // indice 1: Nivel 2
+    stack->addWidget(gameWidget);
 
     connect(gameWidget, &GameWidget::juegoTerminado,
             this, &MainWindow::volverAlMenu);
